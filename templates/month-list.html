@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Расчётные месяцы</title>
+
+    <link
+            rel="stylesheet"
+            href="/static/css/months.css"
+    >
+</head>
+
+<body>
+
+<div class="app">
+
+    <main class="list-content">
+
+        <h1 class="page-title">
+            Расчётные месяцы
+        </h1>
+
+        <form
+                class="month-filter"
+                action="/deposit-months"
+                method="GET"
+        >
+
+            <label for="days">
+                Количество дней
+            </label>
+
+            <div class="filter-row">
+
+                <input
+                        id="days"
+                        type="number"
+                        name="days"
+                        min="28"
+                        max="31"
+                        placeholder="31"
+                        value="{{ .days }}"
+                >
+
+                <button type="submit">
+                    Найти
+                </button>
+
+            </div>
+
+        </form>
+
+        <div class="month-grid">
+
+            {{ range .months }}
+
+            <article
+                    class="month-card"
+                    data-video-url="{{ .VideoURL }}"
+            >
+
+                <a
+                        class="month-card-link"
+                        href="/deposit-month?id={{ .ID }}"
+                >
+
+                    <img
+                            class="month-card-image"
+                            src="{{ .ImageURL }}"
+                            alt="{{ .Name }}"
+                    >
+
+                    <div class="month-card-info">
+
+                        <h2>
+                            {{ .Name }}
+                        </h2>
+
+                        <span class="month-card-days">
+
+                            {{ .DaysCount }}
+
+                            {{ if eq .DaysCount 31 }}
+                                день
+                            {{ else }}
+                                дней
+                            {{ end }}
+
+                        </span>
+
+                    </div>
+
+                </a>
+
+                <div class="month-card-like">
+
+                    <span>
+                        ♡
+                    </span>
+
+                    <span>
+                        {{ .LikesCount }}
+                    </span>
+
+                </div>
+
+            </article>
+
+            {{ else }}
+
+            <p class="empty-result">
+                Месяцы с таким количеством дней не найдены.
+            </p>
+
+            {{ end }}
+
+        </div>
+
+    </main>
+
+    <nav class="bottom-nav">
+
+        <a
+                class="nav-item"
+                href="/deposit-month"
+        >
+            <span class="nav-icon">⌂</span>
+            <span>Лента</span>
+        </a>
+
+        <a
+                class="nav-item"
+                href="/deposit-month/draft"
+        >
+            <span class="nav-icon">＋</span>
+            <span>Добавление</span>
+        </a>
+
+        <a
+                class="nav-item active"
+                href="/deposit-months"
+        >
+            <span class="nav-icon">▦</span>
+            <span>Месяцы</span>
+        </a>
+
+    </nav>
+
+</div>
+
+</body>
+
+</html>
