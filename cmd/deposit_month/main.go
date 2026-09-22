@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
-	"web_backend_percentage/internal/api"
+	"deposit_month/internal/api"
 )
 
 func main() {
-	log.Println("Application start!")
+	log.Println("deposit_month application start")
 
 	if err := api.StartServer(); err != nil {
 		log.Fatal(err)

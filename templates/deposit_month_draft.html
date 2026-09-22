@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>deposit_month draft</title>
+
+    <link
+            rel="stylesheet"
+            href="/static/css/deposit_month.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <main class="draft-content">
+
+        <h1 class="page-title">
+            Добавление расчёта
+        </h1>
+
+
+        <form class="draft-form">
+
+
+            <div class="draft-media-grid">
+
+
+                <div class="draft-media-column">
+
+                    <label class="draft-media-picker">
+
+                        <input
+                                class="draft-file-input"
+                                type="file"
+                                name="deposit_month_image"
+                                accept="image/*"
+                        >
+
+                        <img
+                                class="draft-media-image"
+                                src="{{ .deposit_month.ImageURL }}"
+                                alt="{{ .deposit_month.Name }}"
+                        >
+
+                    </label>
+
+                    <span class="draft-media-label">
+                        Изображение
+                    </span>
+
+                </div>
+
+
+                <div class="draft-media-column">
+
+                    <label class="draft-media-picker">
+
+                        <input
+                                class="draft-file-input"
+                                type="file"
+                                name="deposit_month_video"
+                                accept="video/*"
+                        >
+
+                        <video
+                                class="draft-media-video"
+                                autoplay
+                                muted
+                                loop
+                                playsinline
+                                preload="auto"
+                                poster="{{ .deposit_month.ImageURL }}"
+                        >
+
+                            <source
+                                    src="{{ .deposit_month.VideoURL }}"
+                                    type="video/mp4"
+                            >
+
+                        </video>
+
+                    </label>
+
+                    <span class="draft-media-label">
+                        Видео
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <input
+                    type="hidden"
+                    name="deposit_month_image_url"
+                    value="{{ .deposit_month.ImageURL }}"
+            >
+
+
+            <input
+                    type="hidden"
+                    name="deposit_month_video_url"
+                    value="{{ .deposit_month.VideoURL }}"
+            >
+
+
+            <div class="draft-field">
+
+                <label for="deposit-month-name">
+                    Название месяца
+                </label>
+
+                <input
+                        id="deposit-month-name"
+                        type="text"
+                        name="deposit_month_name"
+                        value="{{ .deposit_month.Name }}"
+                >
+
+            </div>
+
+
+            <div class="draft-field">
+
+                <label for="deposit-month-short-description">
+                    Краткое описание
+                </label>
+
+                <input
+                        id="deposit-month-short-description"
+                        type="text"
+                        name="deposit_month_short_description"
+                        value="{{ .deposit_month.ShortDescription }}"
+                >
+
+            </div>
+
+
+            <div class="draft-field">
+
+                <label for="deposit-month-description">
+                    Полное описание
+                </label>
+
+                <textarea
+                        id="deposit-month-description"
+                        name="deposit_month_description"
+                        rows="3"
+                >{{ .deposit_month.Description }}</textarea>
+
+            </div>
+
+
+            <div class="draft-field">
+
+                <label for="deposit-month-number">
+                    Номер месяца
+                </label>
+
+                <input
+                        id="deposit-month-number"
+                        type="number"
+                        name="deposit_month_number"
+                        min="1"
+                        max="12"
+                        value="{{ .deposit_month.MonthNumber }}"
+                >
+
+            </div>
+
+
+            <div class="draft-field">
+
+                <label for="deposit-month-days-count">
+                    Количество дней
+                </label>
+
+                <input
+                        id="deposit-month-days-count"
+                        type="number"
+                        name="deposit_month_days_count"
+                        min="28"
+                        max="31"
+                        value="{{ .deposit_month.DaysCount }}"
+                >
+
+            </div>
+
+        </form>
+
+    </main>
+
+
+    <nav class="bottom-nav">
+
+        <a
+                class="nav-item"
+                href="/deposit_month"
+        >
+            <span class="nav-icon">⌂</span>
+            <span>Лента</span>
+        </a>
+
+
+        <a
+                class="nav-item active"
+                href="/deposit_month/draft"
+        >
+            <span class="nav-icon">＋</span>
+            <span>Добавление</span>
+        </a>
+
+
+        <a
+                class="nav-item"
+                href="/deposit_month/list"
+        >
+            <span class="nav-icon">▦</span>
+            <span>Месяцы</span>
+        </a>
+
+    </nav>
+
+</div>
+
+</body>
+</html>

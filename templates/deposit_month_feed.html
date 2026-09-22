@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ .deposit_month.Name }}</title>
+
+    <link
+            rel="stylesheet"
+            href="/static/css/deposit_month.css"
+    >
+</head>
+
+<body>
+
+<div class="app">
+
+    <main class="feed">
+
+        <video
+                class="feed-video"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="auto"
+        >
+
+            <source
+                    src="{{ .deposit_month.VideoURL }}"
+                    type="video/mp4"
+            >
+
+        </video>
+
+        <div class="feed-overlay"></div>
+
+
+        <section class="feed-info">
+
+            <h1 class="feed-month-title">
+                {{ .deposit_month.Name }}
+            </h1>
+
+            <details class="feed-description">
+
+                <summary>
+
+                    <span class="feed-description-preview">
+                        {{ .deposit_month.ShortDescription }}
+                    </span>
+
+                    <span class="feed-more">
+                        Ещё
+                    </span>
+
+                </summary>
+
+                <p>
+                    {{ .deposit_month.Description }}
+                </p>
+
+            </details>
+
+        </section>
+
+
+        <aside class="feed-side">
+
+            <div class="feed-stat">
+
+                <span class="feed-stat-value">
+                    {{ printf "%02d" .deposit_month.MonthNumber }}
+                </span>
+
+                <span class="feed-stat-label">
+                    месяц
+                </span>
+
+            </div>
+
+
+            <div class="feed-stat">
+
+                <span class="feed-stat-value">
+                    {{ .deposit_month.DaysCount }}
+                </span>
+
+                <span class="feed-stat-label">
+
+                    {{ if eq .deposit_month.DaysCount 31 }}
+                        день
+                    {{ else }}
+                        дней
+                    {{ end }}
+
+                </span>
+
+            </div>
+
+
+            <label class="feed-like">
+
+                <input
+                        class="feed-like-input"
+                        type="checkbox"
+                >
+
+                <span class="feed-like-content">
+
+                    <span class="feed-heart feed-heart-empty">
+                        ♡
+                    </span>
+
+                    <span class="feed-heart feed-heart-filled">
+                        ♥
+                    </span>
+
+                    <span class="feed-like-count feed-like-count-default">
+                        {{ .likes_count }}
+                    </span>
+
+                    <span class="feed-like-count feed-like-count-selected">
+                        {{ .likes_count_after_like }}
+                    </span>
+
+                </span>
+
+            </label>
+
+
+            <a
+                    class="feed-next"
+                    href="/deposit_month?deposit_month_id={{ .deposit_month.ID }}&next=true"
+                    aria-label="Следующий месяц"
+            >
+                →
+            </a>
+
+        </aside>
+
+    </main>
+
+
+    <nav class="bottom-nav">
+
+        <a
+                class="nav-item active"
+                href="/deposit_month"
+        >
+            <span class="nav-icon">⌂</span>
+            <span>Лента</span>
+        </a>
+
+
+        <a
+                class="nav-item"
+                href="/deposit_month/draft"
+        >
+            <span class="nav-icon">＋</span>
+            <span>Добавление</span>
+        </a>
+
+
+        <a
+                class="nav-item"
+                href="/deposit_month/list"
+        >
+            <span class="nav-icon">▦</span>
+            <span>Месяцы</span>
+        </a>
+
+    </nav>
+
+</div>
+
+</body>
+</html>

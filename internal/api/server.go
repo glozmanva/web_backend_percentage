@@ -3,24 +3,39 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 
-	"web_backend_percentage/internal/app/handler"
-	"web_backend_percentage/internal/app/repository"
+	"deposit_month/internal/app/handler"
+	"deposit_month/internal/app/repository"
 )
 
 func StartServer() error {
-	repo := repository.NewRepository()
-	h := handler.NewHandler(repo)
+	deposit_month_repository := repository.New_deposit_month_repository()
+
+	deposit_month_handler :=
+		handler.New_deposit_month_handler(deposit_month_repository)
 
 	router := gin.Default()
 
 	router.LoadHTMLGlob("templates/*.html")
 
+	router.Static(
+		"/static",
+		"./resources",
+	)
 
-	router.Static("/static", "./resources")
+	router.GET(
+		"/deposit_month",
+		deposit_month_handler.Get_deposit_month,
+	)
 
-	router.GET("/deposit-month", h.GetDepositMonth)
-	router.GET("/deposit-month/draft", h.GetDraftDepositMonth)
-	router.GET("/deposit-months", h.GetDepositMonths)
+	router.GET(
+		"/deposit_month/draft",
+		deposit_month_handler.Get_draft_deposit_month,
+	)
+
+	router.GET(
+		"/deposit_month/list",
+		deposit_month_handler.Get_deposit_months,
+	)
 
 	return router.Run(":8080")
 }

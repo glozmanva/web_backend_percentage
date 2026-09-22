@@ -1,4 +1,4 @@
-module web_backend_percentage
+module deposit_month
 
 go 1.27.1
 
