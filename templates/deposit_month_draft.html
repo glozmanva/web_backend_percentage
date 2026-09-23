@@ -1,22 +1,18 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0"
     >
 
-    <title>deposit_month draft</title>
+    <title>Добавление расчёта</title>
 
     <link
             rel="stylesheet"
             href="/static/css/deposit_month.css"
     >
-
 </head>
 
 <body>
@@ -29,31 +25,28 @@
             Добавление расчёта
         </h1>
 
+        {{ if .has_draft }}
 
-        <form class="draft-form">
-
+        <form
+                class="draft-form"
+                action="/deposit_month/publish"
+                method="POST"
+        >
 
             <div class="draft-media-grid">
 
-
                 <div class="draft-media-column">
 
-                    <label class="draft-media-picker">
-
-                        <input
-                                class="draft-file-input"
-                                type="file"
-                                name="deposit_month_image"
-                                accept="image/*"
-                        >
+                    <div class="draft-media-picker">
 
                         <img
                                 class="draft-media-image"
-                                src="{{ .deposit_month.ImageURL }}"
+                                src="{{ if .deposit_month.ImageURL }}{{ .deposit_month.ImageURL }}{{ else }}/static/default/default.jpg{{ end }}"
                                 alt="{{ .deposit_month.Name }}"
+                                onerror="this.onerror=null; this.src='/static/default/default.jpg';"
                         >
 
-                    </label>
+                    </div>
 
                     <span class="draft-media-label">
                         Изображение
@@ -61,36 +54,22 @@
 
                 </div>
 
-
                 <div class="draft-media-column">
 
-                    <label class="draft-media-picker">
-
-                        <input
-                                class="draft-file-input"
-                                type="file"
-                                name="deposit_month_video"
-                                accept="video/*"
-                        >
+                    <div class="draft-media-picker">
 
                         <video
                                 class="draft-media-video"
+                                src="{{ if .deposit_month.VideoURL }}{{ .deposit_month.VideoURL }}{{ else }}/static/default/default.mp4{{ end }}"
                                 autoplay
                                 muted
                                 loop
                                 playsinline
                                 preload="auto"
-                                poster="{{ .deposit_month.ImageURL }}"
-                        >
+                                onerror="this.onerror=null; this.src='/static/default/default.mp4'; this.load();"
+                        ></video>
 
-                            <source
-                                    src="{{ .deposit_month.VideoURL }}"
-                                    type="video/mp4"
-                            >
-
-                        </video>
-
-                    </label>
+                    </div>
 
                     <span class="draft-media-label">
                         Видео
@@ -98,23 +77,7 @@
 
                 </div>
 
-
             </div>
-
-
-            <input
-                    type="hidden"
-                    name="deposit_month_image_url"
-                    value="{{ .deposit_month.ImageURL }}"
-            >
-
-
-            <input
-                    type="hidden"
-                    name="deposit_month_video_url"
-                    value="{{ .deposit_month.VideoURL }}"
-            >
-
 
             <div class="draft-field">
 
@@ -127,26 +90,27 @@
                         type="text"
                         name="deposit_month_name"
                         value="{{ .deposit_month.Name }}"
+                        maxlength="50"
+                        required
                 >
 
             </div>
 
-
             <div class="draft-field">
 
                 <label for="deposit-month-short-description">
-                    Краткое описание
+                    Краткая информация
                 </label>
 
                 <input
                         id="deposit-month-short-description"
                         type="text"
                         name="deposit_month_short_description"
-                        value="{{ .deposit_month.ShortDescription }}"
+                        maxlength="255"
+                        required
                 >
 
             </div>
-
 
             <div class="draft-field">
 
@@ -158,10 +122,10 @@
                         id="deposit-month-description"
                         name="deposit_month_description"
                         rows="3"
-                >{{ .deposit_month.Description }}</textarea>
+                        maxlength="1000"
+                ></textarea>
 
             </div>
-
 
             <div class="draft-field">
 
@@ -175,11 +139,10 @@
                         name="deposit_month_number"
                         min="1"
                         max="12"
-                        value="{{ .deposit_month.MonthNumber }}"
+                        required
                 >
 
             </div>
-
 
             <div class="draft-field">
 
@@ -193,15 +156,117 @@
                         name="deposit_month_days_count"
                         min="28"
                         max="31"
-                        value="{{ .deposit_month.DaysCount }}"
+                        required
                 >
 
             </div>
 
+            <button
+                    class="filter-button"
+                    type="submit"
+            >
+                Опубликовать
+            </button>
+
         </form>
 
-    </main>
+        {{ else }}
 
+        <form
+                class="draft-form"
+                action="/deposit_month/draft"
+                method="POST"
+        >
+
+            <div class="draft-media-grid">
+
+                <div class="draft-media-column">
+
+                    <label class="draft-media-picker">
+
+                        <input
+                                id="deposit-month-image"
+                                class="draft-file-input"
+                                type="file"
+                                accept="image/*"
+                                required
+                        >
+
+                        <img
+                                id="deposit-month-image-preview"
+                                class="draft-media-image"
+                                src="/static/default/default.jpg"
+                                alt="Предпросмотр изображения"
+                        >
+
+                    </label>
+
+                    <span class="draft-media-label">
+                        Фото
+                    </span>
+
+                </div>
+
+                <div class="draft-media-column">
+
+                    <label class="draft-media-picker">
+
+                        <input
+                                id="deposit-month-video"
+                                class="draft-file-input"
+                                type="file"
+                                accept="video/*"
+                                required
+                        >
+
+                        <video
+                                id="deposit-month-video-preview"
+                                class="draft-media-video"
+                                src="/static/default/default.mp4"
+                                autoplay
+                                muted
+                                loop
+                                playsinline
+                        ></video>
+
+                    </label>
+
+                    <span class="draft-media-label">
+                        Видео
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="draft-field">
+
+                <label for="deposit-month-name">
+                    Название месяца
+                </label>
+
+                <input
+                        id="deposit-month-name"
+                        type="text"
+                        name="deposit_month_name"
+                        maxlength="50"
+                        required
+                >
+
+            </div>
+
+            <button
+                    class="filter-button"
+                    type="submit"
+            >
+                Далее
+            </button>
+
+        </form>
+
+        {{ end }}
+
+    </main>
 
     <nav class="bottom-nav">
 
@@ -213,7 +278,6 @@
             <span>Лента</span>
         </a>
 
-
         <a
                 class="nav-item active"
                 href="/deposit_month/draft"
@@ -221,7 +285,6 @@
             <span class="nav-icon">＋</span>
             <span>Добавление</span>
         </a>
-
 
         <a
                 class="nav-item"
@@ -234,6 +297,45 @@
     </nav>
 
 </div>
+
+<script>
+    const imageInput =
+        document.getElementById("deposit-month-image");
+
+    const imagePreview =
+        document.getElementById("deposit-month-image-preview");
+
+    if (imageInput && imagePreview) {
+        imageInput.addEventListener("change", function () {
+            const file = this.files[0];
+
+            if (file) {
+                imagePreview.src =
+                    URL.createObjectURL(file);
+            }
+        });
+    }
+
+    const videoInput =
+        document.getElementById("deposit-month-video");
+
+    const videoPreview =
+        document.getElementById("deposit-month-video-preview");
+
+    if (videoInput && videoPreview) {
+        videoInput.addEventListener("change", function () {
+            const file = this.files[0];
+
+            if (file) {
+                videoPreview.src =
+                    URL.createObjectURL(file);
+
+                videoPreview.load();
+                videoPreview.play();
+            }
+        });
+    }
+</script>
 
 </body>
 </html>

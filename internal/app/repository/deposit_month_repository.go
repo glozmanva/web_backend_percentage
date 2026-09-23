@@ -1,314 +1,310 @@
 package repository
 
-import "fmt"
+import (
+	"database/sql"
+	"errors"
+	"fmt"
+	"time"
 
-const (
-	Deposit_month_status_draft     = "draft"
-	Deposit_month_status_published = "published"
-	Deposit_month_status_deleted   = "deleted"
+	"deposit_month/internal/app/ds"
+
+	"gorm.io/gorm"
 )
 
-type Deposit_month struct {
-	ID               int
-	Name             string
-	ShortDescription string
-	Description      string
-
-	MonthNumber int
-	DaysCount   int
-
-	Status string
-
-	ImageURL string
-	VideoURL string
-
-	Likes []int
+type DepositMonthWithLikes struct {
+	ds.DepositMonth
+	LikesCount int64 `gorm:"column:likes_count"`
 }
 
-type Deposit_month_repository struct {
-	deposit_months []Deposit_month
-}
+func (r *Repository) GetFeedDepositMonth(
+	depositMonthID int,
+	next bool,
+) (*DepositMonthWithLikes, error) {
 
-func New_deposit_month_repository() *Deposit_month_repository {
-	return &Deposit_month_repository{
-		deposit_months: []Deposit_month{
-			{
-				ID:               1,
-				Name:             "Январь",
-				ShortDescription: "Начало годового цикла начислений.",
-				Description:      "В январе теплее, когда деньги не просто лежат, а понемногу растут на вкладе.",
-				MonthNumber:      1,
-				DaysCount:        31,
-				Status:           Deposit_month_status_published,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/january.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/january.mp4",
-				Likes:            []int{1, 3, 5, 8},
-			},
-			{
-				ID:               2,
-				Name:             "Февраль",
-				ShortDescription: "Второй расчётный период года.",
-				Description:      "Февраль короткий, но даже за 28 дней вклад успевает принести начисленные проценты.",
-				MonthNumber:      2,
-				DaysCount:        28,
-				Status:           Deposit_month_status_published,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/february.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/february.mp4",
-				Likes:            []int{2, 4, 6},
-			},
-			{
-				ID:               3,
-				Name:             "Март",
-				ShortDescription: "Начало весеннего периода начислений.",
-				Description:      "Весной растёт всё — пусть вместе с первыми листьями растут и накопления.",
-				MonthNumber:      3,
-				DaysCount:        31,
-				Status:           Deposit_month_status_published,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/march.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/march.mp4",
-				Likes:            []int{1, 2, 4, 7, 9},
-			},
-			{
-				ID:               4,
-				Name:             "Апрель",
-				ShortDescription: "Весенний расчётный период.",
-				Description:      "Пока за окном идут апрельские дожди, проценты по вкладу продолжают начисляться.",
-				MonthNumber:      4,
-				DaysCount:        30,
-				Status:           Deposit_month_status_published,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/april.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/april.mp4",
-				Likes:            []int{2, 8},
-			},
-			{
-				ID:               5,
-				Name:             "Май",
-				ShortDescription: "Завершение весеннего периода начислений.",
-				Description:      "Май — время цветения, а накопления тоже могут постепенно расти.",
-				MonthNumber:      5,
-				DaysCount:        31,
-				Status:           Deposit_month_status_published,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/may.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/may.mp4",
-				Likes:            []int{1, 3, 6, 7},
-			},
-			{
-				ID:               6,
-				Name:             "Июнь",
-				ShortDescription: "Начало летнего периода начислений.",
-				Description:      "Лето только начинается, а деньги уже могут работать, пока вы отдыхаете.",
-				MonthNumber:      6,
-				DaysCount:        30,
-				Status:           Deposit_month_status_published,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/june.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/june.mp4",
-				Likes:            []int{5, 8, 10},
-			},
-			{
-				ID:               7,
-				Name:             "Июль",
-				ShortDescription: "Летний расчётный период.",
-				Description:      "Пока июль радует солнцем, вклад продолжает приносить начисленные проценты.",
-				MonthNumber:      7,
-				DaysCount:        31,
-				Status:           Deposit_month_status_published,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/july.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/july.mp4",
-				Likes:            []int{1, 4, 6},
-			},
-			{
-				ID:               8,
-				Name:             "Август",
-				ShortDescription: "Завершение летнего периода начислений.",
-				Description:      "Август — хороший момент посмотреть, сколько успели подрасти накопления за лето.",
-				MonthNumber:      8,
-				DaysCount:        31,
-				Status:           Deposit_month_status_published,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/august.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/august.mp4",
-				Likes:            []int{2, 3},
-			},
-			{
-				ID:               9,
-				Name:             "Сентябрь",
-				ShortDescription: "Начало осеннего периода начислений.",
-				Description:      "Осень начинается спокойнее, когда накопления продолжают работать сами.",
-				MonthNumber:      9,
-				DaysCount:        30,
-				Status:           Deposit_month_status_draft,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/september.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/september.mp4",
-				Likes:            []int{},
-			},
-			{
-				ID:               10,
-				Name:             "Октябрь",
-				ShortDescription: "Осенний расчётный период.",
-				Description:      "Октябрьский период используется для расчёта процентов за 31 календарный день.",
-				MonthNumber:      10,
-				DaysCount:        31,
-				Status:           Deposit_month_status_deleted,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/october.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/october.mp4",
-				Likes:            []int{},
-			},
-			{
-				ID:               11,
-				Name:             "Ноябрь",
-				ShortDescription: "Поздний осенний расчётный период.",
-				Description:      "Ноябрьский период используется для расчёта процентов за 30 календарных дней.",
-				MonthNumber:      11,
-				DaysCount:        30,
-				Status:           Deposit_month_status_deleted,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/november.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/november.mp4",
-				Likes:            []int{},
-			},
-			{
-				ID:               12,
-				Name:             "Декабрь",
-				ShortDescription: "Завершение годового цикла начислений.",
-				Description:      "Декабрь завершает годовой цикл расчёта ежемесячных процентных выплат.",
-				MonthNumber:      12,
-				DaysCount:        31,
-				Status:           Deposit_month_status_deleted,
-				ImageURL:         "http://localhost:9000/deposit-month-assets/december.jpg",
-				VideoURL:         "http://localhost:9000/deposit-month-assets/december.mp4",
-				Likes:            []int{},
-			},
-		},
+	if depositMonthID == 0 {
+		var result DepositMonthWithLikes
+
+		tx := r.db.
+			Model(&ds.DepositMonth{}).
+			Select(`
+				deposit_months.*,
+				(
+					SELECT COUNT(*)
+					FROM deposit_month_likes
+					WHERE deposit_month_likes.deposit_month_id = deposit_months.id
+				) AS likes_count
+			`).
+			Where(
+				"deposit_months.status = ?",
+				ds.DepositMonthStatusPublished,
+			).
+			Order("deposit_months.id ASC").
+			Limit(1).
+			Scan(&result)
+
+		if tx.Error != nil {
+			return nil, tx.Error
+		}
+
+		if tx.RowsAffected == 0 {
+			return nil, gorm.ErrRecordNotFound
+		}
+
+		return &result, nil
 	}
+
+	if !next {
+		var result DepositMonthWithLikes
+
+		tx := r.db.
+			Model(&ds.DepositMonth{}).
+			Select(`
+				deposit_months.*,
+				(
+					SELECT COUNT(*)
+					FROM deposit_month_likes
+					WHERE deposit_month_likes.deposit_month_id = deposit_months.id
+				) AS likes_count
+			`).
+			Where(
+				"deposit_months.status = ?",
+				ds.DepositMonthStatusPublished,
+			).
+			Where(
+				"deposit_months.id = ?",
+				depositMonthID,
+			).
+			Limit(1).
+			Scan(&result)
+
+		if tx.Error != nil {
+			return nil, tx.Error
+		}
+
+		if tx.RowsAffected == 0 {
+			return nil, gorm.ErrRecordNotFound
+		}
+
+		return &result, nil
+	}
+
+	var nextResult DepositMonthWithLikes
+
+	tx := r.db.
+		Model(&ds.DepositMonth{}).
+		Select(`
+			deposit_months.*,
+			(
+				SELECT COUNT(*)
+				FROM deposit_month_likes
+				WHERE deposit_month_likes.deposit_month_id = deposit_months.id
+			) AS likes_count
+		`).
+		Where(
+			"deposit_months.status = ?",
+			ds.DepositMonthStatusPublished,
+		).
+		Where(
+			"deposit_months.id > ?",
+			depositMonthID,
+		).
+		Order("deposit_months.id ASC").
+		Limit(1).
+		Scan(&nextResult)
+
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	if tx.RowsAffected > 0 {
+		return &nextResult, nil
+	}
+
+	var firstResult DepositMonthWithLikes
+
+	tx = r.db.
+		Model(&ds.DepositMonth{}).
+		Select(`
+			deposit_months.*,
+			(
+				SELECT COUNT(*)
+				FROM deposit_month_likes
+				WHERE deposit_month_likes.deposit_month_id = deposit_months.id
+			) AS likes_count
+		`).
+		Where(
+			"deposit_months.status = ?",
+			ds.DepositMonthStatusPublished,
+		).
+		Order("deposit_months.id ASC").
+		Limit(1).
+		Scan(&firstResult)
+
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	return &firstResult, nil
 }
 
-func (r *Deposit_month_repository) Get_published_deposit_months(
-	min_days_count int,
-	max_days_count int,
-) []Deposit_month {
+func (r *Repository) GetPublishedDepositMonths(
+	minDaysCount int,
+	maxDaysCount int,
+) ([]DepositMonthWithLikes, error) {
 
-	result := make([]Deposit_month, 0)
+	var depositMonths []DepositMonthWithLikes
 
-	for _, deposit_month := range r.deposit_months {
+	err := r.db.
+		Model(&ds.DepositMonth{}).
+		Select(`
+			deposit_months.*,
+			(
+				SELECT COUNT(*)
+				FROM deposit_month_likes
+				WHERE deposit_month_likes.deposit_month_id = deposit_months.id
+			) AS likes_count
+		`).
+		Where(
+			"deposit_months.status = ?",
+			ds.DepositMonthStatusPublished,
+		).
+		Where(
+			"deposit_months.days_count BETWEEN ? AND ?",
+			minDaysCount,
+			maxDaysCount,
+		).
+		Order("deposit_months.month_number ASC").
+		Scan(&depositMonths).Error
 
-		if deposit_month.Status != Deposit_month_status_published {
-			continue
-		}
+	if err != nil {
+		return nil, err
+	}
 
-		if deposit_month.DaysCount < min_days_count {
-			continue
-		}
+	return depositMonths, nil
+}
 
-		if deposit_month.DaysCount > max_days_count {
-			continue
-		}
+func (r *Repository) GetDraftDepositMonth(
+	creatorID int,
+) (*ds.DepositMonth, error) {
 
-		result = append(
-			result,
-			deposit_month,
+	var depositMonth ds.DepositMonth
+
+	err := r.db.
+		Where(
+			"creator_id = ? AND status = ?",
+			creatorID,
+			ds.DepositMonthStatusDraft,
+		).
+		First(&depositMonth).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &depositMonth, nil
+}
+
+func (r *Repository) CreateDraft(
+	name string,
+	creatorID int,
+) (*ds.DepositMonth, error) {
+
+	depositMonth := ds.DepositMonth{
+		Name:      name,
+		Status:    ds.DepositMonthStatusDraft,
+		CreatorID: creatorID,
+	}
+
+	err := r.db.Create(&depositMonth).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &depositMonth, nil
+}
+
+func (r *Repository) PublishDraft(
+	creatorID int,
+	name string,
+	shortDescription string,
+	description string,
+	monthNumber int16,
+	daysCount int16,
+) error {
+
+	formedAt := time.Now()
+
+	updates := map[string]interface{}{
+		"name":              name,
+		"short_description": shortDescription,
+		"description":       description,
+		"month_number":      monthNumber,
+		"days_count":        daysCount,
+		"status":            ds.DepositMonthStatusPublished,
+		"formed_at":         formedAt,
+	}
+
+	result := r.db.
+		Model(&ds.DepositMonth{}).
+		Where(
+			"creator_id = ? AND status = ?",
+			creatorID,
+			ds.DepositMonthStatusDraft,
+		).
+		Updates(updates)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf(
+			"черновик пользователя не найден",
 		)
 	}
 
-	return result
+	return nil
 }
 
-func (r *Deposit_month_repository) Get_deposit_month(
-	deposit_month_id int,
-) (Deposit_month, error) {
+func (r *Repository) DeleteDepositMonthSQL(
+	depositMonthID int,
+) error {
 
-	for _, deposit_month := range r.deposit_months {
+	sqlDB, err := r.db.DB()
 
-		if deposit_month.ID == deposit_month_id &&
-			deposit_month.Status == Deposit_month_status_published {
-
-			return deposit_month, nil
-		}
+	if err != nil {
+		return err
 	}
 
-	return Deposit_month{},
-		fmt.Errorf(
-			"deposit_month с id %d не найден",
-			deposit_month_id,
-		)
-}
+	result, err := sqlDB.Exec(
+		`UPDATE deposit_months SET status = $1 WHERE id = $2 AND status = $3`,
+		ds.DepositMonthStatusDeleted,
+		depositMonthID,
+		ds.DepositMonthStatusPublished,
+	)
 
-func (r *Deposit_month_repository) Get_first_published_deposit_month() (
-	Deposit_month,
-	error,
-) {
-
-	for _, deposit_month := range r.deposit_months {
-
-		if deposit_month.Status ==
-			Deposit_month_status_published {
-
-			return deposit_month, nil
-		}
+	if err != nil {
+		return err
 	}
 
-	return Deposit_month{},
-		fmt.Errorf(
-			"опубликованные deposit_month не найдены",
-		)
-}
+	rowsAffected, err := result.RowsAffected()
 
-func (r *Deposit_month_repository) Get_draft_deposit_month() (
-	Deposit_month,
-	error,
-) {
-
-	for _, deposit_month := range r.deposit_months {
-
-		if deposit_month.Status ==
-			Deposit_month_status_draft {
-
-			return deposit_month, nil
-		}
+	if err != nil {
+		return err
 	}
 
-	return Deposit_month{},
-		fmt.Errorf(
-			"draft deposit_month не найден",
-		)
-}
-
-func (r *Deposit_month_repository) Get_next_published_deposit_month(
-	deposit_month_id int,
-) (Deposit_month, error) {
-
-	current_index := -1
-
-	for index, deposit_month := range r.deposit_months {
-
-		if deposit_month.ID == deposit_month_id &&
-			deposit_month.Status == Deposit_month_status_published {
-
-			current_index = index
-			break
-		}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
 	}
 
-	if current_index == -1 {
-		return Deposit_month{},
-			fmt.Errorf(
-				"deposit_month с id %d не найден",
-				deposit_month_id,
-			)
-	}
-
-	for step := 1; step < len(r.deposit_months); step++ {
-
-		index :=
-			(current_index + step) %
-				len(r.deposit_months)
-
-		if r.deposit_months[index].Status ==
-			Deposit_month_status_published {
-
-			return r.deposit_months[index], nil
-		}
-	}
-
-	return Deposit_month{},
-		fmt.Errorf(
-			"следующий deposit_month не найден",
-		)
+	return nil
 }

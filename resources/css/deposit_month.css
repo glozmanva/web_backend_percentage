@@ -4,17 +4,13 @@
     --background: #121214;
     --surface: #2F2E33;
     --surface-hover: #3A393F;
-
     --input: #23242A;
     --border: #45444B;
-
     --accent: #9C99FF;
     --accent-hover: #B0AEFF;
-
     --text: #FFFFFF;
     --text-secondary: #ADACB3;
     --text-muted: #85848A;
-
     --black: #000000;
 }
 
@@ -31,12 +27,10 @@ body {
 body {
     background: var(--background);
     color: var(--text);
-
     font-family:
             "Inter",
             Arial,
             sans-serif;
-
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -53,67 +47,41 @@ a {
     text-decoration: none;
 }
 
-
-/* =========================
-   APP
-   ========================= */
-
 .app {
     position: relative;
-
     width: 390px;
     max-width: 100%;
-
     height: min(844px, 100svh);
     min-height: 650px;
-
     overflow: hidden;
-
     border-radius: 30px;
-
     background: var(--background);
 }
 
-
-/* =========================
-   BOTTOM NAVIGATION
-   ========================= */
-
 .bottom-nav {
     position: absolute;
-
     left: 0;
     right: 0;
     bottom: 0;
-
     height: 74px;
-
     padding: 6px 22px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     background: var(--surface);
-
     z-index: 20;
 }
 
 .nav-item {
     width: 91px;
     height: 50px;
-
     border-radius: 14px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     gap: 2px;
-
     color: var(--text-secondary);
-
     font-size: 11px;
     font-weight: 500;
 }
@@ -133,61 +101,37 @@ a {
     color: var(--black);
 }
 
-
-/* =========================
-   PAGE TITLE
-   ========================= */
-
 .page-title {
     margin: 0 0 20px;
-
     color: var(--text);
-
     font-size: 29px;
     font-weight: 700;
     line-height: 1.15;
 }
 
-
-/* =========================
-   FEED
-   ========================= */
-
 .feed {
     position: relative;
-
     width: 100%;
     height: calc(100% - 74px);
-
     overflow: hidden;
-
     background: #000000;
 }
 
 .feed-video {
     position: absolute;
-
     inset: 0;
-
     width: 100%;
     height: 100%;
-
     object-fit: cover;
-
     background: #000000;
-
     z-index: 1;
 }
 
 .feed-overlay {
     position: absolute;
-
     inset: 0;
-
     z-index: 2;
-
     pointer-events: none;
-
     background:
             linear-gradient(
                     to bottom,
@@ -197,26 +141,17 @@ a {
             );
 }
 
-
-/* =========================
-   FEED LEFT INFORMATION
-   ========================= */
-
 .feed-info {
     position: absolute;
-
     left: 20px;
     right: 105px;
     bottom: 30px;
-
     z-index: 5;
 }
 
 .feed-month-title {
     margin: 0 0 9px;
-
     color: #FFFFFF;
-
     font-size: 31px;
     font-weight: 700;
     line-height: 1.05;
@@ -224,13 +159,11 @@ a {
 
 .feed-description {
     margin: 0;
-
     color: #FFFFFF;
 }
 
 .feed-description summary {
     list-style: none;
-
     cursor: pointer;
 }
 
@@ -240,14 +173,10 @@ a {
 
 .feed-description-preview {
     display: -webkit-box;
-
     overflow: hidden;
-
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-
     color: #FFFFFF;
-
     font-size: 14px;
     font-weight: 400;
     line-height: 1.4;
@@ -255,11 +184,8 @@ a {
 
 .feed-more {
     display: block;
-
     margin-top: 6px;
-
     color: #FFFFFF;
-
     font-size: 13px;
     font-weight: 600;
     line-height: 1.2;
@@ -267,48 +193,33 @@ a {
 
 .feed-description p {
     margin: 8px 0 0;
-
     color: #E4E4E8;
-
     font-size: 13px;
     line-height: 1.4;
 }
 
-
-/* =========================
-   FEED RIGHT INFORMATION
-   ========================= */
-
 .feed-side {
     position: absolute;
-
     right: 18px;
     bottom: 31px;
-
     width: 64px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
-
     gap: 15px;
-
     z-index: 6;
 }
 
 .feed-stat {
     width: 64px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
-
     text-align: center;
 }
 
 .feed-stat-value {
     color: #FFFFFF;
-
     font-size: 21px;
     font-weight: 700;
     line-height: 1;
@@ -316,41 +227,17 @@ a {
 
 .feed-stat-label {
     margin-top: 3px;
-
     color: rgba(255, 255, 255, 0.72);
-
     font-size: 10px;
     font-weight: 500;
     line-height: 1.1;
 }
 
-
-/* =========================
-   FEED LIKE
-   ========================= */
-
-.feed-like {
-    cursor: pointer;
-}
-
-.feed-like-input {
-    position: absolute;
-
-    width: 1px;
-    height: 1px;
-
-    opacity: 0;
-
-    pointer-events: none;
-}
-
 .feed-like-content {
     width: 48px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
-
     color: #FFFFFF;
 }
 
@@ -359,69 +246,22 @@ a {
     line-height: 36px;
 }
 
-.feed-heart-filled {
-    display: none;
-}
-
 .feed-like-count {
     margin-top: 2px;
-
     color: #FFFFFF;
-
     font-size: 13px;
     font-weight: 600;
 }
 
-.feed-like-count-selected {
-    display: none;
-}
-
-.feed-like-input:checked
-+
-.feed-like-content
-.feed-heart-empty {
-    display: none;
-}
-
-.feed-like-input:checked
-+
-.feed-like-content
-.feed-heart-filled {
-    display: block;
-}
-
-.feed-like-input:checked
-+
-.feed-like-content
-.feed-like-count-default {
-    display: none;
-}
-
-.feed-like-input:checked
-+
-.feed-like-content
-.feed-like-count-selected {
-    display: block;
-}
-
-
-/* =========================
-   FEED NEXT
-   ========================= */
-
 .feed-next {
     width: 48px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     color: #FFFFFF;
-
     font-size: 37px;
     font-weight: 400;
     line-height: 38px;
-
     transition:
             transform 0.2s ease,
             opacity 0.2s ease;
@@ -429,22 +269,13 @@ a {
 
 .feed-next:hover {
     transform: translateX(3px);
-
     opacity: 0.8;
 }
 
-
-/* =========================
-   LIST
-   ========================= */
-
 .list-content {
     position: absolute;
-
     inset: 0 0 74px;
-
     padding: 34px 16px 24px;
-
     overflow-y: auto;
 }
 
@@ -452,176 +283,117 @@ a {
     width: 0;
 }
 
-
-/* =========================
-   FILTER
-   ========================= */
-
 .deposit-month-filter {
     width: 100%;
-
     margin-bottom: 20px;
-
     padding: 16px;
-
     border-radius: 18px;
-
     background: var(--surface);
 }
 
 .filter-title {
     margin-bottom: 16px;
-
     color: var(--text);
-
     font-size: 14px;
     font-weight: 600;
 }
 
 .dual-range {
     position: relative;
-
     width: 100%;
     height: 26px;
 }
 
-
-/* вся линия серая */
 .range-track {
     position: absolute;
-
     left: 0;
     right: 0;
     top: 11px;
-
     height: 4px;
-
     border-radius: 999px;
-
     background: #64636A;
-
     z-index: 1;
 }
 
-
-/* выбранная область */
 .range-selected-track {
     position: absolute;
-
     top: 11px;
-
     height: 4px;
-
     border-radius: 999px;
-
     background: var(--accent);
-
     z-index: 2;
 }
 
-
-/* сами два range */
 .range-input {
     position: absolute;
-
     left: 0;
     top: 1px;
-
     width: 100%;
     height: 24px;
-
     margin: 0;
-
     appearance: none;
     -webkit-appearance: none;
-
     background: transparent;
-
     pointer-events: none;
-
     z-index: 3;
 }
 
 .range-input::-webkit-slider-runnable-track {
     height: 4px;
-
     background: transparent;
 }
 
 .range-input::-webkit-slider-thumb {
     width: 18px;
     height: 18px;
-
     margin-top: -7px;
-
     border: none;
     border-radius: 50%;
-
     background: var(--accent);
-
     appearance: none;
     -webkit-appearance: none;
-
     cursor: pointer;
-
     pointer-events: auto;
 }
 
 .range-input::-moz-range-track {
     height: 4px;
-
     background: transparent;
 }
 
 .range-input::-moz-range-thumb {
     width: 18px;
     height: 18px;
-
     border: none;
     border-radius: 50%;
-
     background: var(--accent);
-
     cursor: pointer;
-
     pointer-events: auto;
 }
 
-
-/* нижние значения 28 29 30 31 */
 .range-labels {
     margin-top: 2px;
     margin-bottom: 13px;
-
     display: flex;
     justify-content: space-between;
-
     color: var(--text-muted);
-
     font-size: 11px;
     font-weight: 500;
 }
 
-
-/* значения внутри выбранного диапазона */
 .range-label-selected {
     color: #FFFFFF;
-
     font-weight: 600;
 }
 
 .filter-button {
     width: 100%;
     height: 45px;
-
     border: none;
     border-radius: 13px;
-
     background: var(--accent);
     color: var(--black);
-
     cursor: pointer;
-
     font-size: 14px;
     font-weight: 600;
 }
@@ -630,40 +402,26 @@ a {
     background: var(--accent-hover);
 }
 
-
-/* =========================
-   GRID
-   ========================= */
-
 .deposit-month-grid {
     display: grid;
-
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
-
     gap: 16px;
 }
 
 .deposit-month-card {
     position: relative;
-
     min-width: 0;
-
     padding: 6px 6px 42px;
-
     overflow: hidden;
-
     border: 1px solid var(--border);
     border-radius: 17px;
-
     background: var(--surface);
 }
 
 .deposit-month-card:hover {
     border-color: var(--accent);
-
     background: var(--surface-hover);
-
     transform: translateY(-2px);
 }
 
@@ -674,13 +432,9 @@ a {
 .deposit-month-card-image {
     width: 100%;
     height: 108px;
-
     display: block;
-
     border-radius: 13px;
-
     object-fit: cover;
-
     background: #17171A;
 }
 
@@ -690,18 +444,14 @@ a {
 
 .deposit-month-card-info h2 {
     margin: 0 0 7px;
-
     color: var(--text);
-
     font-size: 17px;
     font-weight: 600;
 }
 
 .deposit-month-card-number {
     display: block;
-
     color: #FFFFFF;
-
     font-size: 15px;
     font-weight: 600;
     line-height: 1.2;
@@ -709,54 +459,64 @@ a {
 
 .deposit-month-card-days {
     display: block;
-
     margin-top: 2px;
-
     color: var(--text-secondary);
-
     font-size: 12px;
     line-height: 1.2;
 }
 
 .deposit-month-card-like {
     position: absolute;
-
     right: 12px;
     bottom: 11px;
-
     display: flex;
     align-items: center;
-
     gap: 4px;
-
     color: var(--text);
-
     font-size: 14px;
     font-weight: 500;
 }
 
+.deposit-month-delete-form {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin: 0;
+    z-index: 10;
+}
+
+.deposit-month-delete-button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.deposit-month-delete-button:hover {
+    background: rgba(0, 0, 0, 0.78);
+}
+
 .empty-result {
     grid-column: 1 / -1;
-
     color: var(--text-secondary);
-
     text-align: center;
-
     font-size: 14px;
 }
 
-
-/* =========================
-   DRAFT
-   ========================= */
-
 .draft-content {
     position: absolute;
-
     inset: 0 0 74px;
-
     padding: 34px 18px 24px;
-
     overflow-y: auto;
 }
 
@@ -767,61 +527,41 @@ a {
 .draft-form {
     display: flex;
     flex-direction: column;
-
     gap: 12px;
 }
 
-
-/* =========================
-   DRAFT MEDIA
-   ========================= */
-
 .draft-media-grid {
     width: 100%;
-
     display: grid;
-
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
-
     gap: 12px;
-
     margin-bottom: 4px;
 }
 
 .draft-media-column {
     min-width: 0;
-
     display: flex;
     flex-direction: column;
 }
 
 .draft-media-picker {
     position: relative;
-
     width: 100%;
     height: 136px;
-
     display: block;
-
     overflow: hidden;
-
     border: 1px solid var(--border);
     border-radius: 16px;
-
     background: #17171A;
-
     cursor: pointer;
 }
 
 .draft-file-input {
     position: absolute;
-
     width: 1px;
     height: 1px;
-
     opacity: 0;
-
     pointer-events: none;
 }
 
@@ -829,42 +569,28 @@ a {
 .draft-media-video {
     width: 100%;
     height: 100%;
-
     display: block;
-
     object-fit: cover;
-
     pointer-events: none;
 }
 
 .draft-media-label {
     display: block;
-
     margin-top: 7px;
-
     color: var(--text-secondary);
-
     text-align: center;
-
     font-size: 12px;
     font-weight: 500;
 }
 
-
-/* =========================
-   DRAFT FIELDS
-   ========================= */
-
 .draft-field {
     display: flex;
     flex-direction: column;
-
     gap: 7px;
 }
 
 .draft-field label {
     color: var(--text-secondary);
-
     font-size: 13px;
     line-height: 16px;
 }
@@ -872,17 +598,12 @@ a {
 .draft-field input,
 .draft-field textarea {
     width: 100%;
-
     padding: 0 14px;
-
     border: 1px solid var(--border);
     border-radius: 12px;
-
     outline: none;
-
     background: var(--input);
     color: var(--text);
-
     font-size: 14px;
     font-weight: 500;
 }
@@ -893,12 +614,9 @@ a {
 
 .draft-field textarea {
     min-height: 82px;
-
     padding-top: 12px;
     padding-bottom: 12px;
-
     resize: vertical;
-
     line-height: 1.4;
 }
 
@@ -907,13 +625,12 @@ a {
     border-color: var(--accent);
 }
 
-
-/* =========================
-   MOBILE
-   ========================= */
+.draft-field input[readonly] {
+    color: var(--text-secondary);
+    cursor: default;
+}
 
 @media (max-width: 430px) {
-
     body {
         background: var(--background);
     }
@@ -921,7 +638,6 @@ a {
     .app {
         width: 100%;
         height: 100svh;
-
         border-radius: 0;
     }
 }

@@ -1,15 +1,54 @@
 package main
 
 import (
-	"log"
+	"fmt"
 
-	"deposit_month/internal/api"
+	"deposit_month/internal/app/config"
+	"deposit_month/internal/app/dsn"
+	"deposit_month/internal/app/handler"
+	"deposit_month/internal/app/repository"
+	"deposit_month/internal/pkg"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	log.Println("deposit_month application start")
+	router := gin.Default()
 
-	if err := api.StartServer(); err != nil {
-		log.Fatal(err)
+	conf, err := config.NewConfig()
+	if err != nil {
+		logrus.Fatalf(
+			"error loading config: %v",
+			err,
+		)
 	}
+
+	postgresString := dsn.FromEnv()
+
+	if postgresString == "" {
+		logrus.Fatal(
+			"database connection string is empty",
+		)
+	}
+
+	fmt.Println(postgresString)
+
+	rep, err := repository.New(postgresString)
+	if err != nil {
+		logrus.Fatalf(
+			"error initializing repository: %v",
+			err,
+		)
+	}
+
+	hand := handler.NewHandler(rep)
+
+	application := pkg.NewApp(
+		conf,
+		router,
+		hand,
+	)
+
+	application.RunApp()
 }

@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0"
@@ -16,7 +13,6 @@
             rel="stylesheet"
             href="/static/css/deposit_month.css"
     >
-
 </head>
 
 <body>
@@ -29,7 +25,6 @@
             Расчётные месяцы
         </h1>
 
-
         <form
                 class="deposit-month-filter"
                 action="/deposit_month/list"
@@ -40,21 +35,20 @@
                 Количество дней
             </div>
 
-
             <div class="dual-range">
 
-                <!-- Весь диапазон серый -->
                 <div class="range-track"></div>
 
-                <!-- Только выбранная область сиреневая -->
                 <div
                         class="range-selected-track"
                         style="
                         left: {{ .min_days_position }}%;
-                        width: calc({{ .max_days_position }}% - {{ .min_days_position }}%);
+                        width: calc(
+                            {{ .max_days_position }}% -
+                            {{ .min_days_position }}%
+                        );
                     "
                 ></div>
-
 
                 <input
                         class="range-input"
@@ -66,7 +60,6 @@
                         value="{{ .min_days_count }}"
                         aria-label="Минимальное количество дней"
                 >
-
 
                 <input
                         class="range-input"
@@ -81,35 +74,14 @@
 
             </div>
 
-
             <div class="range-labels">
 
-                <span
-                        class="{{ if and (ge 28 .min_days_count) (le 28 .max_days_count) }}range-label-selected{{ end }}"
-                >
-                    28
-                </span>
-
-                <span
-                        class="{{ if and (ge 29 .min_days_count) (le 29 .max_days_count) }}range-label-selected{{ end }}"
-                >
-                    29
-                </span>
-
-                <span
-                        class="{{ if and (ge 30 .min_days_count) (le 30 .max_days_count) }}range-label-selected{{ end }}"
-                >
-                    30
-                </span>
-
-                <span
-                        class="{{ if and (ge 31 .min_days_count) (le 31 .max_days_count) }}range-label-selected{{ end }}"
-                >
-                    31
-                </span>
+                <span>28</span>
+                <span>29</span>
+                <span>30</span>
+                <span>31</span>
 
             </div>
-
 
             <button
                     class="filter-button"
@@ -120,30 +92,23 @@
 
         </form>
 
-
         <div class="deposit-month-grid">
 
             {{ range .deposit_months }}
 
-
-            <article
-                    class="deposit-month-card"
-                    data-video-url="{{ .VideoURL }}"
-            >
-
+            <article class="deposit-month-card">
 
                 <a
                         class="deposit-month-card-link"
                         href="/deposit_month?deposit_month_id={{ .ID }}"
                 >
 
-
                     <img
                             class="deposit-month-card-image"
-                            src="{{ .ImageURL }}"
+                            src="{{ if .ImageURL }}{{ .ImageURL }}{{ else }}/static/default/default.jpg{{ end }}"
                             alt="{{ .Name }}"
+                            onerror="this.onerror=null; this.src='/static/default/default.jpg';"
                     >
-
 
                     <div class="deposit-month-card-info">
 
@@ -151,59 +116,57 @@
                             {{ .Name }}
                         </h2>
 
-
                         <span class="deposit-month-card-number">
-                            {{ printf "%02d" .MonthNumber }}
+                            {{ .MonthNumber }}
                         </span>
 
-
                         <span class="deposit-month-card-days">
-
-                            {{ .DaysCount }}
-
-                            {{ if eq .DaysCount 31 }}
-                                день
-                            {{ else }}
-                                дней
-                            {{ end }}
-
+                            {{ .DaysCount }} дней
                         </span>
 
                     </div>
 
                 </a>
 
-
                 <div class="deposit-month-card-like">
-
-                    <span>
-                        ♡
-                    </span>
-
-                    <span>
-                        {{ .LikesCount }}
-                    </span>
-
+                    <span>♡</span>
+                    <span>{{ .LikesCount }}</span>
                 </div>
 
+                <form
+                        class="deposit-month-delete-form"
+                        action="/deposit_month/delete"
+                        method="POST"
+                >
+                    <input
+                            type="hidden"
+                            name="deposit_month_id"
+                            value="{{ .ID }}"
+                    >
+
+                    <button
+                            class="deposit-month-delete-button"
+                            type="submit"
+                            aria-label="Удалить карточку"
+                            title="Удалить"
+                    >
+                        ×
+                    </button>
+                </form>
 
             </article>
 
-
             {{ else }}
-
 
             <p class="empty-result">
                 Месяцы в выбранном диапазоне не найдены.
             </p>
-
 
             {{ end }}
 
         </div>
 
     </main>
-
 
     <nav class="bottom-nav">
 
@@ -215,7 +178,6 @@
             <span>Лента</span>
         </a>
 
-
         <a
                 class="nav-item"
                 href="/deposit_month/draft"
@@ -223,7 +185,6 @@
             <span class="nav-icon">＋</span>
             <span>Добавление</span>
         </a>
-
 
         <a
                 class="nav-item active"
