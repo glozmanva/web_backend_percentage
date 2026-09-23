@@ -54,10 +54,6 @@ a {
 }
 
 
-/* =========================
-   APP
-   ========================= */
-
 .app {
     position: relative;
 
@@ -75,9 +71,6 @@ a {
 }
 
 
-/* =========================
-   BOTTOM NAVIGATION
-   ========================= */
 
 .bottom-nav {
     position: absolute;
@@ -134,10 +127,6 @@ a {
 }
 
 
-/* =========================
-   PAGE TITLE
-   ========================= */
-
 .page-title {
     margin: 0 0 20px;
 
@@ -147,11 +136,6 @@ a {
     font-weight: 700;
     line-height: 1.15;
 }
-
-
-/* =========================
-   FEED
-   ========================= */
 
 .feed {
     position: relative;
@@ -196,11 +180,6 @@ a {
                     rgba(18, 18, 20, 0.90) 100%
             );
 }
-
-
-/* =========================
-   FEED LEFT INFORMATION
-   ========================= */
 
 .feed-info {
     position: absolute;
@@ -274,11 +253,6 @@ a {
     line-height: 1.4;
 }
 
-
-/* =========================
-   FEED RIGHT INFORMATION
-   ========================= */
-
 .feed-side {
     position: absolute;
 
@@ -323,11 +297,6 @@ a {
     font-weight: 500;
     line-height: 1.1;
 }
-
-
-/* =========================
-   FEED LIKE
-   ========================= */
 
 .feed-like {
     cursor: pointer;
@@ -404,11 +373,6 @@ a {
     display: block;
 }
 
-
-/* =========================
-   FEED NEXT
-   ========================= */
-
 .feed-next {
     width: 48px;
 
@@ -433,11 +397,6 @@ a {
     opacity: 0.8;
 }
 
-
-/* =========================
-   LIST
-   ========================= */
-
 .list-content {
     position: absolute;
 
@@ -451,11 +410,6 @@ a {
 .list-content::-webkit-scrollbar {
     width: 0;
 }
-
-
-/* =========================
-   FILTER
-   ========================= */
 
 .deposit-month-filter {
     width: 100%;
@@ -485,8 +439,6 @@ a {
     height: 26px;
 }
 
-
-/* вся линия серая */
 .range-track {
     position: absolute;
 
@@ -503,8 +455,6 @@ a {
     z-index: 1;
 }
 
-
-/* выбранная область */
 .range-selected-track {
     position: absolute;
 
@@ -519,8 +469,6 @@ a {
     z-index: 2;
 }
 
-
-/* сами два range */
 .range-input {
     position: absolute;
 
@@ -602,8 +550,6 @@ a {
     font-weight: 500;
 }
 
-
-/* значения внутри выбранного диапазона */
 .range-label-selected {
     color: #FFFFFF;
 
@@ -629,11 +575,6 @@ a {
 .filter-button:hover {
     background: var(--accent-hover);
 }
-
-
-/* =========================
-   GRID
-   ========================= */
 
 .deposit-month-grid {
     display: grid;
@@ -745,11 +686,6 @@ a {
     font-size: 14px;
 }
 
-
-/* =========================
-   DRAFT
-   ========================= */
-
 .draft-content {
     position: absolute;
 
@@ -770,11 +706,6 @@ a {
 
     gap: 12px;
 }
-
-
-/* =========================
-   DRAFT MEDIA
-   ========================= */
 
 .draft-media-grid {
     width: 100%;
@@ -851,10 +782,6 @@ a {
 }
 
 
-/* =========================
-   DRAFT FIELDS
-   ========================= */
-
 .draft-field {
     display: flex;
     flex-direction: column;
@@ -906,11 +833,6 @@ a {
 .draft-field textarea:focus {
     border-color: var(--accent);
 }
-
-
-/* =========================
-   MOBILE
-   ========================= */
 
 @media (max-width: 430px) {
 
