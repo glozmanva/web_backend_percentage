@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -9,15 +8,12 @@
             content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        {{ .deposit_month.Name }}
-    </title>
+    <title>{{ .deposit_month.Name }}</title>
 
     <link
             rel="stylesheet"
             href="/static/css/deposit_month.css"
     >
-
 </head>
 
 <body>
@@ -28,18 +24,20 @@
 
         <video
                 class="feed-video"
-                src="{{ if .deposit_month.VideoURL }}{{ .deposit_month.VideoURL }}{{ else }}/static/default/default.mp4{{ end }}"
                 autoplay
                 muted
                 loop
                 playsinline
                 preload="auto"
-                onerror="this.onerror=null; this.src='/static/default/default.mp4'; this.load();"
-        ></video>
-
+                onerror="this.src='/static/default/default.mp4'"
+        >
+            <source
+                    src="{{ if .deposit_month.VideoURL }}{{ .deposit_month.VideoURL }}{{ else }}/static/default/default.mp4{{ end }}"
+                    type="video/mp4"
+            >
+        </video>
 
         <div class="feed-overlay"></div>
-
 
         <section class="feed-info">
 
@@ -47,29 +45,26 @@
                 {{ .deposit_month.Name }}
             </h1>
 
+            <div class="feed-description">
 
-            <details class="feed-description">
-
-                <summary>
-
-                    <span class="feed-description-preview">
-                        {{ .deposit_month.ShortDescription }}
-                    </span>
-
-                    <span class="feed-more">
-                        Ещё
-                    </span>
-
-                </summary>
-
-                <p>
+                <div
+                        id="feed-description-text"
+                        class="feed-description-text"
+                >
                     {{ .deposit_month.Description }}
-                </p>
+                </div>
 
-            </details>
+                <button
+                        id="feed-description-toggle"
+                        class="feed-description-toggle"
+                        type="button"
+                >
+                    Ещё
+                </button>
+
+            </div>
 
         </section>
-
 
         <aside class="feed-side">
 
@@ -85,7 +80,6 @@
 
             </div>
 
-
             <div class="feed-stat">
 
                 <span class="feed-stat-value">
@@ -98,11 +92,6 @@
 
             </div>
 
-
-            <!--
-                Во второй лабораторной лайк поставить нельзя.
-                Только показываем количество из БД.
-            -->
             <div class="feed-like-content">
 
                 <span class="feed-heart">
@@ -115,7 +104,6 @@
 
             </div>
 
-
             <a
                     class="feed-next"
                     href="/deposit_month?deposit_month_id={{ .deposit_month.ID }}&next=true"
@@ -127,7 +115,6 @@
         </aside>
 
     </main>
-
 
     <nav class="bottom-nav">
 
@@ -158,6 +145,44 @@
     </nav>
 
 </div>
+
+<script>
+    const descriptionText =
+        document.getElementById("feed-description-text");
+
+    const descriptionToggle =
+        document.getElementById("feed-description-toggle");
+
+    function checkDescriptionOverflow() {
+        const lineHeight =
+            parseFloat(
+                window.getComputedStyle(descriptionText).lineHeight
+            );
+
+        const twoLinesHeight =
+            lineHeight * 2;
+
+        if (descriptionText.scrollHeight <= twoLinesHeight + 2) {
+            descriptionToggle.style.display = "none";
+        }
+    }
+
+    checkDescriptionOverflow();
+
+    descriptionToggle.addEventListener("click", function () {
+
+        const isExpanded =
+            descriptionText.classList.contains("expanded");
+
+        if (isExpanded) {
+            descriptionText.classList.remove("expanded");
+            descriptionToggle.textContent = "Ещё";
+        } else {
+            descriptionText.classList.add("expanded");
+            descriptionToggle.textContent = "Свернуть";
+        }
+    });
+</script>
 
 </body>
 </html>

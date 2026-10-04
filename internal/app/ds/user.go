@@ -7,6 +7,7 @@ type User struct {
 	FullName  string    `gorm:"column:full_name;type:varchar(255);not null"`
 	BirthDate time.Time `gorm:"column:birth_date;type:date;not null"`
 	Email     string    `gorm:"type:varchar(255);not null;uniqueIndex"`
+	Password  string    `gorm:"type:varchar(255);not null"`
 }
 
 func (User) TableName() string {

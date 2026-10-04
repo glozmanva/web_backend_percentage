@@ -27,10 +27,7 @@ body {
 body {
     background: var(--background);
     color: var(--text);
-    font-family:
-            "Inter",
-            Arial,
-            sans-serif;
+    font-family: "Inter", Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -162,16 +159,7 @@ a {
     color: #FFFFFF;
 }
 
-.feed-description summary {
-    list-style: none;
-    cursor: pointer;
-}
-
-.feed-description summary::-webkit-details-marker {
-    display: none;
-}
-
-.feed-description-preview {
+.feed-description-text {
     display: -webkit-box;
     overflow: hidden;
     -webkit-box-orient: vertical;
@@ -182,20 +170,23 @@ a {
     line-height: 1.4;
 }
 
-.feed-more {
+.feed-description-text.expanded {
     display: block;
-    margin-top: 6px;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+}
+
+.feed-description-toggle {
+    display: block;
+    margin: 6px 0 0;
+    padding: 0;
+    border: none;
+    background: transparent;
     color: #FFFFFF;
+    cursor: pointer;
     font-size: 13px;
     font-weight: 600;
     line-height: 1.2;
-}
-
-.feed-description p {
-    margin: 8px 0 0;
-    color: #E4E4E8;
-    font-size: 13px;
-    line-height: 1.4;
 }
 
 .feed-side {
@@ -381,11 +372,6 @@ a {
     font-weight: 500;
 }
 
-.range-label-selected {
-    color: #FFFFFF;
-    font-weight: 600;
-}
-
 .filter-button {
     width: 100%;
     height: 45px;
@@ -412,7 +398,7 @@ a {
 .deposit-month-card {
     position: relative;
     min-width: 0;
-    padding: 6px 6px 42px;
+    padding: 6px;
     overflow: hidden;
     border: 1px solid var(--border);
     border-radius: 17px;
@@ -442,68 +428,95 @@ a {
     padding: 9px 6px 0;
 }
 
-.deposit-month-card-info h2 {
-    margin: 0 0 7px;
-    color: var(--text);
-    font-size: 17px;
-    font-weight: 600;
+.deposit-month-card-main-row {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.deposit-month-card-text {
+    min-width: 0;
+    flex: 1;
 }
 
 .deposit-month-card-number {
     display: block;
+    margin-bottom: 3px;
     color: #FFFFFF;
     font-size: 15px;
     font-weight: 600;
     line-height: 1.2;
 }
 
+.deposit-month-card-info h2 {
+    margin: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.deposit-month-card-like {
+    position: static;
+    flex-shrink: 0;
+    min-width: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1px;
+    color: var(--text);
+}
+
+.deposit-month-card-heart {
+    font-size: 17px;
+    line-height: 18px;
+}
+
+.deposit-month-card-like-count {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 15px;
+}
+
 .deposit-month-card-days {
     display: block;
-    margin-top: 2px;
+    margin-top: 5px;
     color: var(--text-secondary);
     font-size: 12px;
     line-height: 1.2;
 }
 
-.deposit-month-card-like {
-    position: absolute;
-    right: 12px;
-    bottom: 11px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--text);
-    font-size: 14px;
-    font-weight: 500;
-}
-
 .deposit-month-delete-form {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    margin: 0;
-    z-index: 10;
+    position: static;
+    width: 100%;
+    margin: 12px 0 5px;
+    padding: 0 6px;
+    display: flex;
+    justify-content: center;
 }
 
 .deposit-month-delete-button {
-    width: 28px;
-    height: 28px;
-    padding: 0;
+    position: static;
+    width: 94%;
+    height: 31px;
+    padding: 0 12px;
     border: none;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.55);
-    color: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 9px;
+    background: var(--accent);
+    color: var(--black);
     cursor: pointer;
-    font-size: 24px;
-    font-weight: 400;
-    line-height: 1;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .deposit-month-delete-button:hover {
-    background: rgba(0, 0, 0, 0.78);
+    background: var(--accent-hover);
 }
 
 .empty-result {
@@ -533,8 +546,7 @@ a {
 .draft-media-grid {
     width: 100%;
     display: grid;
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 12px;
     margin-bottom: 4px;
 }
@@ -555,6 +567,10 @@ a {
     border-radius: 16px;
     background: #17171A;
     cursor: pointer;
+}
+
+.draft-media-static {
+    cursor: default;
 }
 
 .draft-file-input {
@@ -623,11 +639,6 @@ a {
 .draft-field input:focus,
 .draft-field textarea:focus {
     border-color: var(--accent);
-}
-
-.draft-field input[readonly] {
-    color: var(--text-secondary);
-    cursor: default;
 }
 
 @media (max-width: 430px) {

@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 
 	"deposit_month/internal/app/ds"
@@ -16,146 +15,99 @@ type DepositMonthWithLikes struct {
 	LikesCount int64 `gorm:"column:likes_count"`
 }
 
+func (r *Repository) feedQuery() *gorm.DB {
+	return r.db.
+		Model(&ds.DepositMonth{}).
+		Select(`
+			deposit_months.*,
+			(
+				SELECT COUNT(*)
+				FROM deposit_month_likes
+				WHERE deposit_month_likes.deposit_month_id = deposit_months.id
+			) AS likes_count
+		`).
+		Where(
+			"deposit_months.status = ?",
+			ds.DepositMonthStatusPublished,
+		)
+}
+
 func (r *Repository) GetFeedDepositMonth(
 	depositMonthID int,
 	next bool,
-) (*DepositMonthWithLikes, error) {
+) (DepositMonthWithLikes, error) {
+	var depositMonth DepositMonthWithLikes
 
-	if depositMonthID == 0 {
-		var result DepositMonthWithLikes
-
-		tx := r.db.
-			Model(&ds.DepositMonth{}).
-			Select(`
-				deposit_months.*,
-				(
-					SELECT COUNT(*)
-					FROM deposit_month_likes
-					WHERE deposit_month_likes.deposit_month_id = deposit_months.id
-				) AS likes_count
-			`).
-			Where(
-				"deposit_months.status = ?",
-				ds.DepositMonthStatusPublished,
-			).
+	if next && depositMonthID > 0 {
+		result := r.feedQuery().
+			Where("deposit_months.id > ?", depositMonthID).
 			Order("deposit_months.id ASC").
 			Limit(1).
-			Scan(&result)
+			Scan(&depositMonth)
 
-		if tx.Error != nil {
-			return nil, tx.Error
+		if result.Error != nil {
+			return DepositMonthWithLikes{}, result.Error
 		}
 
-		if tx.RowsAffected == 0 {
-			return nil, gorm.ErrRecordNotFound
+		if result.RowsAffected == 1 {
+			return depositMonth, nil
 		}
 
-		return &result, nil
-	}
+		depositMonth = DepositMonthWithLikes{}
 
-	if !next {
-		var result DepositMonthWithLikes
-
-		tx := r.db.
-			Model(&ds.DepositMonth{}).
-			Select(`
-				deposit_months.*,
-				(
-					SELECT COUNT(*)
-					FROM deposit_month_likes
-					WHERE deposit_month_likes.deposit_month_id = deposit_months.id
-				) AS likes_count
-			`).
-			Where(
-				"deposit_months.status = ?",
-				ds.DepositMonthStatusPublished,
-			).
-			Where(
-				"deposit_months.id = ?",
-				depositMonthID,
-			).
+		result = r.feedQuery().
+			Order("deposit_months.id ASC").
 			Limit(1).
-			Scan(&result)
+			Scan(&depositMonth)
 
-		if tx.Error != nil {
-			return nil, tx.Error
+		if result.Error != nil {
+			return DepositMonthWithLikes{}, result.Error
 		}
 
-		if tx.RowsAffected == 0 {
-			return nil, gorm.ErrRecordNotFound
+		if result.RowsAffected == 0 {
+			return DepositMonthWithLikes{}, gorm.ErrRecordNotFound
 		}
 
-		return &result, nil
+		return depositMonth, nil
 	}
 
-	var nextResult DepositMonthWithLikes
+	if depositMonthID > 0 {
+		result := r.feedQuery().
+			Where("deposit_months.id = ?", depositMonthID).
+			Limit(1).
+			Scan(&depositMonth)
 
-	tx := r.db.
-		Model(&ds.DepositMonth{}).
-		Select(`
-			deposit_months.*,
-			(
-				SELECT COUNT(*)
-				FROM deposit_month_likes
-				WHERE deposit_month_likes.deposit_month_id = deposit_months.id
-			) AS likes_count
-		`).
-		Where(
-			"deposit_months.status = ?",
-			ds.DepositMonthStatusPublished,
-		).
-		Where(
-			"deposit_months.id > ?",
-			depositMonthID,
-		).
+		if result.Error != nil {
+			return DepositMonthWithLikes{}, result.Error
+		}
+
+		if result.RowsAffected == 0 {
+			return DepositMonthWithLikes{}, gorm.ErrRecordNotFound
+		}
+
+		return depositMonth, nil
+	}
+
+	result := r.feedQuery().
 		Order("deposit_months.id ASC").
 		Limit(1).
-		Scan(&nextResult)
+		Scan(&depositMonth)
 
-	if tx.Error != nil {
-		return nil, tx.Error
+	if result.Error != nil {
+		return DepositMonthWithLikes{}, result.Error
 	}
 
-	if tx.RowsAffected > 0 {
-		return &nextResult, nil
+	if result.RowsAffected == 0 {
+		return DepositMonthWithLikes{}, gorm.ErrRecordNotFound
 	}
 
-	var firstResult DepositMonthWithLikes
-
-	tx = r.db.
-		Model(&ds.DepositMonth{}).
-		Select(`
-			deposit_months.*,
-			(
-				SELECT COUNT(*)
-				FROM deposit_month_likes
-				WHERE deposit_month_likes.deposit_month_id = deposit_months.id
-			) AS likes_count
-		`).
-		Where(
-			"deposit_months.status = ?",
-			ds.DepositMonthStatusPublished,
-		).
-		Order("deposit_months.id ASC").
-		Limit(1).
-		Scan(&firstResult)
-
-	if tx.Error != nil {
-		return nil, tx.Error
-	}
-
-	if tx.RowsAffected == 0 {
-		return nil, gorm.ErrRecordNotFound
-	}
-
-	return &firstResult, nil
+	return depositMonth, nil
 }
 
 func (r *Repository) GetPublishedDepositMonths(
 	minDaysCount int,
 	maxDaysCount int,
 ) ([]DepositMonthWithLikes, error) {
-
 	var depositMonths []DepositMonthWithLikes
 
 	err := r.db.
@@ -190,7 +142,6 @@ func (r *Repository) GetPublishedDepositMonths(
 func (r *Repository) GetDraftDepositMonth(
 	creatorID int,
 ) (*ds.DepositMonth, error) {
-
 	var depositMonth ds.DepositMonth
 
 	err := r.db.
@@ -216,16 +167,13 @@ func (r *Repository) CreateDraft(
 	name string,
 	creatorID int,
 ) (*ds.DepositMonth, error) {
-
 	depositMonth := ds.DepositMonth{
 		Name:      name,
 		Status:    ds.DepositMonthStatusDraft,
 		CreatorID: creatorID,
 	}
 
-	err := r.db.Create(&depositMonth).Error
-
-	if err != nil {
+	if err := r.db.Create(&depositMonth).Error; err != nil {
 		return nil, err
 	}
 
@@ -235,23 +183,11 @@ func (r *Repository) CreateDraft(
 func (r *Repository) PublishDraft(
 	creatorID int,
 	name string,
-	shortDescription string,
 	description string,
 	monthNumber int16,
 	daysCount int16,
 ) error {
-
-	formedAt := time.Now()
-
-	updates := map[string]interface{}{
-		"name":              name,
-		"short_description": shortDescription,
-		"description":       description,
-		"month_number":      monthNumber,
-		"days_count":        daysCount,
-		"status":            ds.DepositMonthStatusPublished,
-		"formed_at":         formedAt,
-	}
+	now := time.Now()
 
 	result := r.db.
 		Model(&ds.DepositMonth{}).
@@ -260,16 +196,21 @@ func (r *Repository) PublishDraft(
 			creatorID,
 			ds.DepositMonthStatusDraft,
 		).
-		Updates(updates)
+		Updates(map[string]interface{}{
+			"name":         name,
+			"description":  description,
+			"month_number": monthNumber,
+			"days_count":   daysCount,
+			"status":       ds.DepositMonthStatusPublished,
+			"formed_at":    &now,
+		})
 
 	if result.Error != nil {
 		return result.Error
 	}
 
 	if result.RowsAffected == 0 {
-		return fmt.Errorf(
-			"черновик пользователя не найден",
-		)
+		return gorm.ErrRecordNotFound
 	}
 
 	return nil
@@ -278,15 +219,18 @@ func (r *Repository) PublishDraft(
 func (r *Repository) DeleteDepositMonthSQL(
 	depositMonthID int,
 ) error {
-
 	sqlDB, err := r.db.DB()
-
 	if err != nil {
 		return err
 	}
 
 	result, err := sqlDB.Exec(
-		`UPDATE deposit_months SET status = $1 WHERE id = $2 AND status = $3`,
+		`
+		UPDATE deposit_months
+		SET status = $1
+		WHERE id = $2
+		  AND status = $3
+		`,
 		ds.DepositMonthStatusDeleted,
 		depositMonthID,
 		ds.DepositMonthStatusPublished,
@@ -297,7 +241,6 @@ func (r *Repository) DeleteDepositMonthSQL(
 	}
 
 	rowsAffected, err := result.RowsAffected()
-
 	if err != nil {
 		return err
 	}

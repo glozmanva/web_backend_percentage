@@ -9,11 +9,9 @@ const (
 )
 
 type DepositMonth struct {
-	ID int `gorm:"type:integer;primaryKey;autoIncrement"`
-
-	Name             string  `gorm:"type:varchar(50);not null"`
-	ShortDescription *string `gorm:"column:short_description;type:varchar(255)"`
-	Description      *string `gorm:"type:varchar(1000)"`
+	ID          int     `gorm:"type:integer;primaryKey;autoIncrement"`
+	Name        string  `gorm:"type:varchar(50);not null"`
+	Description *string `gorm:"type:varchar(1000)"`
 
 	Status string `gorm:"type:varchar(20);not null"`
 

@@ -12,18 +12,14 @@ import (
 const currentUserID int = 1
 
 func (h *Handler) GetDepositMonth(ctx *gin.Context) {
-	var depositMonthID int
+	depositMonthID := 0
 
-	idStr := ctx.Query("deposit_month_id")
-
-	if idStr != "" {
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			ctx.JSON(
+	if idString := ctx.Query("deposit_month_id"); idString != "" {
+		id, err := strconv.Atoi(idString)
+		if err != nil || id <= 0 {
+			ctx.String(
 				http.StatusBadRequest,
-				gin.H{
-					"error": "некорректный id карточки",
-				},
+				"Некорректный id расчётного месяца",
 			)
 			return
 		}
@@ -33,28 +29,23 @@ func (h *Handler) GetDepositMonth(ctx *gin.Context) {
 
 	next := ctx.Query("next") == "true"
 
-	depositMonth, err :=
-		h.Repository.GetFeedDepositMonth(
-			depositMonthID,
-			next,
+	depositMonth, err := h.Repository.GetFeedDepositMonth(
+		depositMonthID,
+		next,
+	)
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		ctx.String(
+			http.StatusNotFound,
+			"Расчётный месяц не найден",
 		)
+		return
+	}
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(
-				http.StatusNotFound,
-				gin.H{
-					"error": "карточка не найдена",
-				},
-			)
-			return
-		}
-
-		ctx.JSON(
+		ctx.String(
 			http.StatusInternalServerError,
-			gin.H{
-				"error": err.Error(),
-			},
+			err.Error(),
 		)
 		return
 	}
@@ -73,51 +64,23 @@ func (h *Handler) GetDepositMonths(ctx *gin.Context) {
 	minDaysCount := 28
 	maxDaysCount := 31
 
-	minValue := ctx.Query("min_days_count")
-
-	if minValue != "" {
-		value, err := strconv.Atoi(minValue)
-		if err != nil {
-			ctx.JSON(
-				http.StatusBadRequest,
-				gin.H{
-					"error": "некорректное минимальное количество дней",
-				},
-			)
-			return
+	if value := ctx.Query("min_days_count"); value != "" {
+		parsed, err := strconv.Atoi(value)
+		if err == nil && parsed >= 28 && parsed <= 31 {
+			minDaysCount = parsed
 		}
-
-		minDaysCount = value
 	}
 
-	maxValue := ctx.Query("max_days_count")
-
-	if maxValue != "" {
-		value, err := strconv.Atoi(maxValue)
-		if err != nil {
-			ctx.JSON(
-				http.StatusBadRequest,
-				gin.H{
-					"error": "некорректное максимальное количество дней",
-				},
-			)
-			return
+	if value := ctx.Query("max_days_count"); value != "" {
+		parsed, err := strconv.Atoi(value)
+		if err == nil && parsed >= 28 && parsed <= 31 {
+			maxDaysCount = parsed
 		}
-
-		maxDaysCount = value
 	}
 
-	if minDaysCount < 28 ||
-		maxDaysCount > 31 ||
-		minDaysCount > maxDaysCount {
-
-		ctx.JSON(
-			http.StatusBadRequest,
-			gin.H{
-				"error": "некорректный диапазон количества дней",
-			},
-		)
-		return
+	if minDaysCount > maxDaysCount {
+		minDaysCount, maxDaysCount =
+			maxDaysCount, minDaysCount
 	}
 
 	depositMonths, err :=
@@ -127,24 +90,18 @@ func (h *Handler) GetDepositMonths(ctx *gin.Context) {
 		)
 
 	if err != nil {
-		ctx.JSON(
+		ctx.String(
 			http.StatusInternalServerError,
-			gin.H{
-				"error": err.Error(),
-			},
+			err.Error(),
 		)
 		return
 	}
 
-	minDaysPosition :=
-		float64(minDaysCount-28) /
-			float64(31-28) *
-			100
+	minPosition :=
+		float64(minDaysCount-28) / 3.0 * 100.0
 
-	maxDaysPosition :=
-		float64(maxDaysCount-28) /
-			float64(31-28) *
-			100
+	maxPosition :=
+		float64(maxDaysCount-28) / 3.0 * 100.0
 
 	ctx.HTML(
 		http.StatusOK,
@@ -153,35 +110,22 @@ func (h *Handler) GetDepositMonths(ctx *gin.Context) {
 			"deposit_months":    depositMonths,
 			"min_days_count":    minDaysCount,
 			"max_days_count":    maxDaysCount,
-			"min_days_position": minDaysPosition,
-			"max_days_position": maxDaysPosition,
+			"min_days_position": minPosition,
+			"max_days_position": maxPosition,
 		},
 	)
 }
 
-func (h *Handler) GetDraftDepositMonth(ctx *gin.Context) {
+func (h *Handler) GetDraftDepositMonth(
+	ctx *gin.Context,
+) {
 	depositMonth, err :=
-		h.Repository.GetDraftDepositMonth(
-			currentUserID,
-		)
+		h.Repository.GetDraftDepositMonth(currentUserID)
 
 	if err != nil {
-		ctx.JSON(
+		ctx.String(
 			http.StatusInternalServerError,
-			gin.H{
-				"error": err.Error(),
-			},
-		)
-		return
-	}
-
-	if depositMonth == nil {
-		ctx.HTML(
-			http.StatusOK,
-			"deposit_month_draft.html",
-			gin.H{
-				"has_draft": false,
-			},
+			err.Error(),
 		)
 		return
 	}
@@ -190,36 +134,32 @@ func (h *Handler) GetDraftDepositMonth(ctx *gin.Context) {
 		http.StatusOK,
 		"deposit_month_draft.html",
 		gin.H{
-			"has_draft":     true,
+			"has_draft":     depositMonth != nil,
 			"deposit_month": depositMonth,
 		},
 	)
 }
 
-func (h *Handler) CreateDraftDepositMonth(ctx *gin.Context) {
+func (h *Handler) CreateDraftDepositMonth(
+	ctx *gin.Context,
+) {
 	name := ctx.PostForm("deposit_month_name")
 
 	if name == "" {
-		ctx.JSON(
+		ctx.String(
 			http.StatusBadRequest,
-			gin.H{
-				"error": "необходимо указать название",
-			},
+			"Название обязательно",
 		)
 		return
 	}
 
 	existingDraft, err :=
-		h.Repository.GetDraftDepositMonth(
-			currentUserID,
-		)
+		h.Repository.GetDraftDepositMonth(currentUserID)
 
 	if err != nil {
-		ctx.JSON(
+		ctx.String(
 			http.StatusInternalServerError,
-			gin.H{
-				"error": err.Error(),
-			},
+			err.Error(),
 		)
 		return
 	}
@@ -238,11 +178,9 @@ func (h *Handler) CreateDraftDepositMonth(ctx *gin.Context) {
 	)
 
 	if err != nil {
-		ctx.JSON(
+		ctx.String(
 			http.StatusInternalServerError,
-			gin.H{
-				"error": err.Error(),
-			},
+			err.Error(),
 		)
 		return
 	}
@@ -253,78 +191,52 @@ func (h *Handler) CreateDraftDepositMonth(ctx *gin.Context) {
 	)
 }
 
-func (h *Handler) PublishDepositMonth(ctx *gin.Context) {
-	name :=
-		ctx.PostForm(
-			"deposit_month_name",
-		)
+func (h *Handler) PublishDepositMonth(
+	ctx *gin.Context,
+) {
+	name := ctx.PostForm("deposit_month_name")
+	description := ctx.PostForm("deposit_month_description")
 
-	shortDescription :=
-		ctx.PostForm(
-			"deposit_month_short_description",
-		)
-
-	description :=
-		ctx.PostForm(
-			"deposit_month_description",
-		)
-
-	if name == "" {
-		ctx.JSON(
-			http.StatusBadRequest,
-			gin.H{
-				"error": "необходимо указать название",
-			},
-		)
-		return
-	}
-
-	if shortDescription == "" {
-		ctx.JSON(
-			http.StatusBadRequest,
-			gin.H{
-				"error": "необходимо заполнить краткую информацию",
-			},
-		)
-		return
-	}
-
-	monthNumber, err :=
-		strconv.Atoi(
-			ctx.PostForm(
-				"deposit_month_number",
-			),
-		)
+	monthNumber, err := strconv.Atoi(
+		ctx.PostForm("deposit_month_month_number"),
+	)
 
 	if err != nil ||
 		monthNumber < 1 ||
 		monthNumber > 12 {
-
-		ctx.JSON(
+		ctx.String(
 			http.StatusBadRequest,
-			gin.H{
-				"error": "номер месяца должен быть от 1 до 12",
-			},
+			"Некорректный номер месяца",
 		)
 		return
 	}
 
-	daysCount, err :=
-		strconv.Atoi(
-			ctx.PostForm(
-				"deposit_month_days_count",
-			),
-		)
+	daysCount, err := strconv.Atoi(
+		ctx.PostForm("deposit_month_days_count"),
+	)
 
 	if err != nil ||
 		daysCount < 28 ||
 		daysCount > 31 {
-
-		ctx.JSON(
+		ctx.String(
 			http.StatusBadRequest,
-			gin.H{
-				"error": "количество дней должно быть от 28 до 31",
-			},
+			"Некорректное количество дней",
+		)
+		return
+	}
+
+	if name == "" {
+		ctx.String(
+			http.StatusBadRequest,
+			"Название обязательно",
+		)
+		return
+	}
+
+	if description == "" {
+		ctx.String(
+			http.StatusBadRequest,
+			"Описание обязательно",
 		)
 		return
 	}
@@ -332,18 +244,23 @@ func (h *Handler) PublishDepositMonth(ctx *gin.Context) {
 	err = h.Repository.PublishDraft(
 		currentUserID,
 		name,
-		shortDescription,
 		description,
 		int16(monthNumber),
 		int16(daysCount),
 	)
 
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		ctx.String(
+			http.StatusNotFound,
+			"Черновик не найден",
+		)
+		return
+	}
+
 	if err != nil {
-		ctx.JSON(
+		ctx.String(
 			http.StatusInternalServerError,
-			gin.H{
-				"error": err.Error(),
-			},
+			err.Error(),
 		)
 		return
 	}
@@ -354,36 +271,27 @@ func (h *Handler) PublishDepositMonth(ctx *gin.Context) {
 	)
 }
 
-func (h *Handler) DeleteDepositMonth(ctx *gin.Context) {
-	idStr :=
-		ctx.PostForm(
-			"deposit_month_id",
-		)
+func (h *Handler) DeleteDepositMonth(
+	ctx *gin.Context,
+) {
+	id, err := strconv.Atoi(
+		ctx.PostForm("deposit_month_id"),
+	)
 
-	depositMonthID, err :=
-		strconv.Atoi(idStr)
-
-	if err != nil {
-		ctx.JSON(
+	if err != nil || id <= 0 {
+		ctx.String(
 			http.StatusBadRequest,
-			gin.H{
-				"error": "некорректный id карточки",
-			},
+			"Некорректный id",
 		)
 		return
 	}
 
-	err =
-		h.Repository.DeleteDepositMonthSQL(
-			depositMonthID,
-		)
+	err = h.Repository.DeleteDepositMonthSQL(id)
 
 	if err != nil {
-		ctx.JSON(
-			http.StatusNotFound,
-			gin.H{
-				"error": "карточка не найдена",
-			},
+		ctx.String(
+			http.StatusInternalServerError,
+			err.Error(),
 		)
 		return
 	}

@@ -6,9 +6,7 @@
             name="viewport"
             content="width=device-width, initial-scale=1.0"
     >
-
     <title>Добавление расчёта</title>
-
     <link
             rel="stylesheet"
             href="/static/css/deposit_month.css"
@@ -27,60 +25,50 @@
 
         {{ if .has_draft }}
 
+        <div class="draft-media-grid">
+
+            <div class="draft-media-column">
+                <div class="draft-media-picker draft-media-static">
+                    <img
+                            class="draft-media-image"
+                            src="{{ if .deposit_month.ImageURL }}{{ .deposit_month.ImageURL }}{{ else }}/static/default/default.jpg{{ end }}"
+                            onerror="this.src='/static/default/default.jpg'"
+                            alt="{{ .deposit_month.Name }}"
+                    >
+                </div>
+
+                <span class="draft-media-label">
+                    Изображение
+                </span>
+            </div>
+
+            <div class="draft-media-column">
+                <div class="draft-media-picker draft-media-static">
+                    <video
+                            class="draft-media-video"
+                            autoplay
+                            muted
+                            loop
+                            playsinline
+                            preload="auto"
+                            src="{{ if .deposit_month.VideoURL }}{{ .deposit_month.VideoURL }}{{ else }}/static/default/default.mp4{{ end }}"
+                    ></video>
+                </div>
+
+                <span class="draft-media-label">
+                    Видео
+                </span>
+            </div>
+
+        </div>
+
         <form
                 class="draft-form"
                 action="/deposit_month/publish"
                 method="POST"
         >
 
-            <div class="draft-media-grid">
-
-                <div class="draft-media-column">
-
-                    <div class="draft-media-picker">
-
-                        <img
-                                class="draft-media-image"
-                                src="{{ if .deposit_month.ImageURL }}{{ .deposit_month.ImageURL }}{{ else }}/static/default/default.jpg{{ end }}"
-                                alt="{{ .deposit_month.Name }}"
-                                onerror="this.onerror=null; this.src='/static/default/default.jpg';"
-                        >
-
-                    </div>
-
-                    <span class="draft-media-label">
-                        Изображение
-                    </span>
-
-                </div>
-
-                <div class="draft-media-column">
-
-                    <div class="draft-media-picker">
-
-                        <video
-                                class="draft-media-video"
-                                src="{{ if .deposit_month.VideoURL }}{{ .deposit_month.VideoURL }}{{ else }}/static/default/default.mp4{{ end }}"
-                                autoplay
-                                muted
-                                loop
-                                playsinline
-                                preload="auto"
-                                onerror="this.onerror=null; this.src='/static/default/default.mp4'; this.load();"
-                        ></video>
-
-                    </div>
-
-                    <span class="draft-media-label">
-                        Видео
-                    </span>
-
-                </div>
-
-            </div>
-
             <div class="draft-field">
-
                 <label for="deposit-month-name">
                     Название месяца
                 </label>
@@ -90,45 +78,24 @@
                         type="text"
                         name="deposit_month_name"
                         value="{{ .deposit_month.Name }}"
-                        maxlength="50"
                         required
                 >
-
             </div>
 
             <div class="draft-field">
-
-                <label for="deposit-month-short-description">
-                    Краткая информация
-                </label>
-
-                <input
-                        id="deposit-month-short-description"
-                        type="text"
-                        name="deposit_month_short_description"
-                        maxlength="255"
-                        required
-                >
-
-            </div>
-
-            <div class="draft-field">
-
                 <label for="deposit-month-description">
-                    Полное описание
+                    Описание
                 </label>
 
                 <textarea
                         id="deposit-month-description"
                         name="deposit_month_description"
                         rows="3"
-                        maxlength="1000"
-                ></textarea>
-
+                        required
+                >{{ .deposit_month.Description }}</textarea>
             </div>
 
             <div class="draft-field">
-
                 <label for="deposit-month-number">
                     Номер месяца
                 </label>
@@ -136,16 +103,15 @@
                 <input
                         id="deposit-month-number"
                         type="number"
-                        name="deposit_month_number"
+                        name="deposit_month_month_number"
                         min="1"
                         max="12"
+                        value="{{ .deposit_month.MonthNumber }}"
                         required
                 >
-
             </div>
 
             <div class="draft-field">
-
                 <label for="deposit-month-days-count">
                     Количество дней
                 </label>
@@ -156,9 +122,9 @@
                         name="deposit_month_days_count"
                         min="28"
                         max="31"
+                        value="{{ .deposit_month.DaysCount }}"
                         required
                 >
-
             </div>
 
             <button
@@ -193,16 +159,16 @@
                         >
 
                         <img
-                                id="deposit-month-image-preview"
+                                id="image-preview"
                                 class="draft-media-image"
                                 src="/static/default/default.jpg"
-                                alt="Предпросмотр изображения"
+                                alt="Изображение"
                         >
 
                     </label>
 
                     <span class="draft-media-label">
-                        Фото
+                        Изображение
                     </span>
 
                 </div>
@@ -220,13 +186,14 @@
                         >
 
                         <video
-                                id="deposit-month-video-preview"
+                                id="video-preview"
                                 class="draft-media-video"
-                                src="/static/default/default.mp4"
                                 autoplay
                                 muted
                                 loop
                                 playsinline
+                                preload="auto"
+                                src="/static/default/default.mp4"
                         ></video>
 
                     </label>
@@ -240,7 +207,6 @@
             </div>
 
             <div class="draft-field">
-
                 <label for="deposit-month-name">
                     Название месяца
                 </label>
@@ -249,10 +215,8 @@
                         id="deposit-month-name"
                         type="text"
                         name="deposit_month_name"
-                        maxlength="50"
                         required
                 >
-
             </div>
 
             <button
@@ -298,44 +262,46 @@
 
 </div>
 
+{{ if not .has_draft }}
+
 <script>
     const imageInput =
         document.getElementById("deposit-month-image");
 
     const imagePreview =
-        document.getElementById("deposit-month-image-preview");
+        document.getElementById("image-preview");
 
-    if (imageInput && imagePreview) {
-        imageInput.addEventListener("change", function () {
-            const file = this.files[0];
+    imageInput.addEventListener("change", function () {
+        const file = this.files[0];
 
-            if (file) {
-                imagePreview.src =
-                    URL.createObjectURL(file);
-            }
-        });
-    }
+        if (!file) {
+            return;
+        }
+
+        imagePreview.src = URL.createObjectURL(file);
+    });
 
     const videoInput =
         document.getElementById("deposit-month-video");
 
     const videoPreview =
-        document.getElementById("deposit-month-video-preview");
+        document.getElementById("video-preview");
 
-    if (videoInput && videoPreview) {
-        videoInput.addEventListener("change", function () {
-            const file = this.files[0];
+    videoInput.addEventListener("change", function () {
+        const file = this.files[0];
 
-            if (file) {
-                videoPreview.src =
-                    URL.createObjectURL(file);
+        if (!file) {
+            return;
+        }
 
-                videoPreview.load();
-                videoPreview.play();
-            }
-        });
-    }
+        videoPreview.src = URL.createObjectURL(file);
+        videoPreview.load();
+
+        videoPreview.play().catch(function () {});
+    });
 </script>
+
+{{ end }}
 
 </body>
 </html>

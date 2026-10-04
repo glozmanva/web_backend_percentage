@@ -44,7 +44,8 @@
                         style="
                         left: {{ .min_days_position }}%;
                         width: calc(
-                            {{ .max_days_position }}% -
+                            {{ .max_days_position }}%
+                            -
                             {{ .min_days_position }}%
                         );
                     "
@@ -75,12 +76,10 @@
             </div>
 
             <div class="range-labels">
-
                 <span>28</span>
                 <span>29</span>
                 <span>30</span>
                 <span>31</span>
-
             </div>
 
             <button
@@ -106,38 +105,49 @@
                     <img
                             class="deposit-month-card-image"
                             src="{{ if .ImageURL }}{{ .ImageURL }}{{ else }}/static/default/default.jpg{{ end }}"
+                            onerror="this.src='/static/default/default.jpg'"
                             alt="{{ .Name }}"
-                            onerror="this.onerror=null; this.src='/static/default/default.jpg';"
                     >
 
                     <div class="deposit-month-card-info">
 
-                        <h2>
-                            {{ .Name }}
-                        </h2>
+                        <div class="deposit-month-card-main-row">
 
-                        <span class="deposit-month-card-number">
-                            {{ .MonthNumber }}
-                        </span>
+                            <div class="deposit-month-card-text">
+
+            <span class="deposit-month-card-number">
+                {{ .MonthNumber }}
+            </span>
+
+                                <h2>
+                                    {{ .Name }}
+                                </h2>
+
+                            </div>
+
+                            <div class="deposit-month-card-like">
+                                <span class="deposit-month-card-heart">♡</span>
+                                <span class="deposit-month-card-like-count">
+                {{ .LikesCount }}
+            </span>
+                            </div>
+
+                        </div>
 
                         <span class="deposit-month-card-days">
-                            {{ .DaysCount }} дней
-                        </span>
+        {{ .DaysCount }} дней
+    </span>
 
                     </div>
 
                 </a>
-
-                <div class="deposit-month-card-like">
-                    <span>♡</span>
-                    <span>{{ .LikesCount }}</span>
-                </div>
 
                 <form
                         class="deposit-month-delete-form"
                         action="/deposit_month/delete"
                         method="POST"
                 >
+
                     <input
                             type="hidden"
                             name="deposit_month_id"
@@ -147,11 +157,10 @@
                     <button
                             class="deposit-month-delete-button"
                             type="submit"
-                            aria-label="Удалить карточку"
-                            title="Удалить"
                     >
-                        ×
+                        Удалить
                     </button>
+
                 </form>
 
             </article>
