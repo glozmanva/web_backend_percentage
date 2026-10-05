@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
 	"deposit_month/internal/app/config"
 	"deposit_month/internal/app/dsn"
@@ -18,23 +18,25 @@ func main() {
 
 	conf, err := config.NewConfig()
 	if err != nil {
-		logrus.Fatalf(
-			"error loading config: %v",
-			err,
-		)
+		logrus.Fatalf("error loading config: %v", err)
 	}
 
 	postgresString := dsn.FromEnv()
-
 	if postgresString == "" {
 		logrus.Fatal(
-			"database connection string is empty",
+			"database environment variables are not configured",
 		)
 	}
 
-	fmt.Println(postgresString)
-
-	rep, err := repository.New(postgresString)
+	rep, err := repository.New(
+		&repository.RepositorySettings{
+			PostgresDSN:     postgresString,
+			MinioEndpoint:   os.Getenv("MINIO_ENDPOINT"),
+			MinioAccessKey:  os.Getenv("MINIO_ACCESS_KEY"),
+			MinioSecretKey:  os.Getenv("MINIO_SECRET_KEY"),
+			MinioBucketName: os.Getenv("MINIO_BUCKET_NAME"),
+		},
+	)
 	if err != nil {
 		logrus.Fatalf(
 			"error initializing repository: %v",

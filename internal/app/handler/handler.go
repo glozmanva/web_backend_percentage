@@ -10,13 +10,18 @@ type Handler struct {
 	Repository *repository.Repository
 }
 
-func NewHandler(r *repository.Repository) *Handler {
+func NewHandler(
+	r *repository.Repository,
+) *Handler {
 	return &Handler{
 		Repository: r,
 	}
 }
 
-func (h *Handler) RegisterHandler(router *gin.Engine) {
+func (h *Handler) RegisterHandler(
+	router *gin.Engine,
+) {
+	// Старые маршруты ЛР2
 	router.GET(
 		"/deposit_month",
 		h.GetDepositMonth,
@@ -46,10 +51,72 @@ func (h *Handler) RegisterHandler(router *gin.Engine) {
 		"/deposit_month/delete",
 		h.DeleteDepositMonth,
 	)
+
+	// ЛР3 API
+	api := router.Group("/api")
+
+	depositMonths :=
+		api.Group("/deposit-months")
+
+	depositMonths.GET(
+		"",
+		h.GetDepositMonthsAPI,
+	)
+
+	depositMonths.GET(
+		"/feed",
+		h.GetDepositMonthFeedAPI,
+	)
+
+	depositMonths.GET(
+		"/draft",
+		h.GetDraftDepositMonthAPI,
+	)
+
+	depositMonths.POST(
+		"",
+		h.CreateDepositMonthAPI,
+	)
+
+	depositMonths.PUT(
+		"/draft",
+		h.PublishDepositMonthAPI,
+	)
+
+	depositMonths.DELETE(
+		"/:id",
+		h.DeleteDepositMonthAPI,
+	)
+
+	depositMonths.POST(
+		"/:id/likes",
+		h.SetDepositMonthLikeAPI,
+	)
+
+	users := api.Group("/users")
+
+	users.POST(
+		"",
+		h.RegisterUserAPI,
+	)
+
+	users.POST(
+		"/authentication",
+		h.AuthenticateUserAPI,
+	)
+
+	users.POST(
+		"/deauthentication",
+		h.DeauthenticateUserAPI,
+	)
 }
 
-func (h *Handler) RegisterStatic(router *gin.Engine) {
-	router.LoadHTMLGlob("templates/*.html")
+func (h *Handler) RegisterStatic(
+	router *gin.Engine,
+) {
+	router.LoadHTMLGlob(
+		"templates/*.html",
+	)
 
 	router.Static(
 		"/static",
