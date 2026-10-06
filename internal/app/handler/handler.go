@@ -21,7 +21,7 @@ func NewHandler(
 func (h *Handler) RegisterHandler(
 	router *gin.Engine,
 ) {
-	// Старые маршруты ЛР2
+	// Старые маршруты интерфейса ЛР2
 	router.GET(
 		"/deposit_month",
 		h.GetDepositMonth,
@@ -52,11 +52,10 @@ func (h *Handler) RegisterHandler(
 		h.DeleteDepositMonth,
 	)
 
-	// ЛР3 API
+	// REST API ЛР3
 	api := router.Group("/api")
 
-	depositMonths :=
-		api.Group("/deposit-months")
+	depositMonths := api.Group("/deposit-months")
 
 	depositMonths.GET(
 		"",
@@ -89,7 +88,7 @@ func (h *Handler) RegisterHandler(
 	)
 
 	depositMonths.POST(
-		"/:id/likes",
+		"/:id/like",
 		h.SetDepositMonthLikeAPI,
 	)
 

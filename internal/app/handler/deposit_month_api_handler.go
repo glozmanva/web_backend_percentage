@@ -83,7 +83,10 @@ func (h *Handler) GetDepositMonthsAPI(
 
 	if value := ctx.Query("min_days_count"); value != "" {
 		parsed, err := strconv.Atoi(value)
-		if err != nil || parsed < 28 || parsed > 31 {
+
+		if err != nil ||
+			parsed < 28 ||
+			parsed > 31 {
 			ctx.JSON(
 				http.StatusBadRequest,
 				gin.H{
@@ -98,7 +101,10 @@ func (h *Handler) GetDepositMonthsAPI(
 
 	if value := ctx.Query("max_days_count"); value != "" {
 		parsed, err := strconv.Atoi(value)
-		if err != nil || parsed < 28 || parsed > 31 {
+
+		if err != nil ||
+			parsed < 28 ||
+			parsed > 31 {
 			ctx.JSON(
 				http.StatusBadRequest,
 				gin.H{
@@ -131,7 +137,9 @@ func (h *Handler) GetDepositMonthsAPI(
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
@@ -147,13 +155,14 @@ func (h *Handler) GetDepositMonthFeedAPI(
 ) {
 	depositMonthID := 0
 
-	if value := ctx.Query("deposit_month_id"); value != "" {
+	if value := ctx.Query("id"); value != "" {
 		parsed, err := strconv.Atoi(value)
+
 		if err != nil || parsed <= 0 {
 			ctx.JSON(
 				http.StatusBadRequest,
 				gin.H{
-					"error": "некорректный deposit_month_id",
+					"error": "некорректный id",
 				},
 			)
 			return
@@ -166,6 +175,7 @@ func (h *Handler) GetDepositMonthFeedAPI(
 
 	if value := ctx.Query("next"); value != "" {
 		parsed, err := strconv.ParseBool(value)
+
 		if err != nil {
 			ctx.JSON(
 				http.StatusBadRequest,
@@ -186,7 +196,10 @@ func (h *Handler) GetDepositMonthFeedAPI(
 			currentuser.GetCurrentUserID(),
 		)
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(
+		err,
+		gorm.ErrRecordNotFound,
+	) {
 		ctx.JSON(
 			http.StatusNotFound,
 			gin.H{
@@ -199,7 +212,9 @@ func (h *Handler) GetDepositMonthFeedAPI(
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
@@ -221,7 +236,9 @@ func (h *Handler) GetDraftDepositMonthAPI(
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
@@ -256,7 +273,9 @@ func (h *Handler) CreateDepositMonthAPI(
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
@@ -274,6 +293,7 @@ func (h *Handler) CreateDepositMonthAPI(
 	err = ctx.Request.ParseMultipartForm(
 		64 << 20,
 	)
+
 	if err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
@@ -296,7 +316,9 @@ func (h *Handler) CreateDepositMonthAPI(
 		return
 	}
 
-	imageHeader, err := ctx.FormFile("image")
+	imageHeader, err :=
+		ctx.FormFile("image")
+
 	if err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
@@ -307,7 +329,9 @@ func (h *Handler) CreateDepositMonthAPI(
 		return
 	}
 
-	videoHeader, err := ctx.FormFile("video")
+	videoHeader, err :=
+		ctx.FormFile("video")
+
 	if err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
@@ -324,7 +348,9 @@ func (h *Handler) CreateDepositMonthAPI(
 	); err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
@@ -335,7 +361,9 @@ func (h *Handler) CreateDepositMonthAPI(
 	); err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
@@ -349,15 +377,18 @@ func (h *Handler) CreateDepositMonthAPI(
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
 
-	err = h.Repository.AddOrReplaceDepositMonthImage(
-		depositMonth.ID,
-		imageHeader,
-	)
+	err =
+		h.Repository.AddOrReplaceDepositMonthImage(
+			depositMonth.ID,
+			imageHeader,
+		)
 
 	if err != nil {
 		_ = h.Repository.DeleteDepositMonthAPI(
@@ -367,15 +398,18 @@ func (h *Handler) CreateDepositMonthAPI(
 
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
 
-	err = h.Repository.AddOrReplaceDepositMonthVideo(
-		depositMonth.ID,
-		videoHeader,
-	)
+	err =
+		h.Repository.AddOrReplaceDepositMonthVideo(
+			depositMonth.ID,
+			videoHeader,
+		)
 
 	if err != nil {
 		_ = h.Repository.DeleteDepositMonthAPI(
@@ -385,7 +419,9 @@ func (h *Handler) CreateDepositMonthAPI(
 
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
@@ -398,7 +434,9 @@ func (h *Handler) CreateDepositMonthAPI(
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
@@ -462,15 +500,48 @@ func (h *Handler) PublishDepositMonthAPI(
 		return
 	}
 
-	err := h.Repository.PublishDraft(
-		currentuser.GetCurrentUserID(),
+	currentUserID :=
+		currentuser.GetCurrentUserID()
+
+	draft, err :=
+		h.Repository.GetDraftDepositMonth(
+			currentUserID,
+		)
+
+	if err != nil {
+		ctx.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	if draft == nil {
+		ctx.JSON(
+			http.StatusNotFound,
+			gin.H{
+				"error": "черновик не найден",
+			},
+		)
+		return
+	}
+
+	draftID := draft.ID
+
+	err = h.Repository.PublishDraft(
+		currentUserID,
 		request.Name,
 		request.Description,
 		request.MonthNumber,
 		request.DaysCount,
 	)
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(
+		err,
+		gorm.ErrRecordNotFound,
+	) {
 		ctx.JSON(
 			http.StatusNotFound,
 			gin.H{
@@ -483,16 +554,31 @@ func (h *Handler) PublishDepositMonthAPI(
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	publishedDepositMonth, err :=
+		h.Repository.GetDepositMonthByID(
+			draftID,
+		)
+
+	if err != nil {
+		ctx.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
 
 	ctx.JSON(
 		http.StatusOK,
-		gin.H{
-			"message": "услуга опубликована",
-		},
+		publishedDepositMonth,
 	)
 }
 
@@ -518,7 +604,10 @@ func (h *Handler) DeleteDepositMonthAPI(
 		currentuser.GetCurrentUserID(),
 	)
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(
+		err,
+		gorm.ErrRecordNotFound,
+	) {
 		ctx.JSON(
 			http.StatusNotFound,
 			gin.H{
@@ -531,7 +620,9 @@ func (h *Handler) DeleteDepositMonthAPI(
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
@@ -539,7 +630,8 @@ func (h *Handler) DeleteDepositMonthAPI(
 	ctx.JSON(
 		http.StatusOK,
 		gin.H{
-			"message": "услуга удалена",
+			"id":     id,
+			"status": "deleted",
 		},
 	)
 }
@@ -562,37 +654,43 @@ func (h *Handler) SetDepositMonthLikeAPI(
 	}
 
 	var request struct {
-		Value *int `json:"value" binding:"required"`
+		Liked *int `json:"liked" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
 			gin.H{
-				"error": "поле value обязательно",
+				"error": "поле liked обязательно",
 			},
 		)
 		return
 	}
 
-	if *request.Value != 0 &&
-		*request.Value != 1 {
+	if *request.Liked != 0 &&
+		*request.Liked != 1 {
 		ctx.JSON(
 			http.StatusBadRequest,
 			gin.H{
-				"error": "value может быть только 0 или 1",
+				"error": "liked может быть только 0 или 1",
 			},
 		)
 		return
 	}
 
+	currentUserID :=
+		currentuser.GetCurrentUserID()
+
 	err = h.Repository.SetDepositMonthLike(
 		id,
-		currentuser.GetCurrentUserID(),
-		*request.Value,
+		currentUserID,
+		*request.Liked,
 	)
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(
+		err,
+		gorm.ErrRecordNotFound,
+	) {
 		ctx.JSON(
 			http.StatusNotFound,
 			gin.H{
@@ -605,7 +703,26 @@ func (h *Handler) SetDepositMonthLikeAPI(
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
-			gin.H{"error": err.Error()},
+			gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	depositMonth, err :=
+		h.Repository.GetFeedDepositMonthAPI(
+			id,
+			false,
+			currentUserID,
+		)
+
+	if err != nil {
+		ctx.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": err.Error(),
+			},
 		)
 		return
 	}
@@ -613,7 +730,9 @@ func (h *Handler) SetDepositMonthLikeAPI(
 	ctx.JSON(
 		http.StatusOK,
 		gin.H{
-			"value": *request.Value,
+			"id":        depositMonth.ID,
+			"liked":     depositMonth.IsLiked,
+			"likeCount": depositMonth.LikesCount,
 		},
 	)
 }

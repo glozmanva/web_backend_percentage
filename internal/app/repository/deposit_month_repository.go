@@ -47,28 +47,38 @@ func (r *Repository) GetFeedDepositMonth(
 
 	if next && depositMonthID > 0 {
 		result := r.feedQuery().
-			Where("deposit_months.id > ?", depositMonthID).
-			Order("deposit_months.id ASC").
+			Where(
+				"deposit_months.id > ?",
+				depositMonthID,
+			).
+			Order(
+				"deposit_months.id ASC",
+			).
 			Limit(1).
 			Scan(&depositMonth)
 
 		if result.Error != nil {
-			return DepositMonthWithLikes{}, result.Error
+			return DepositMonthWithLikes{},
+				result.Error
 		}
 
 		if result.RowsAffected == 1 {
 			return depositMonth, nil
 		}
 
-		depositMonth = DepositMonthWithLikes{}
+		depositMonth =
+			DepositMonthWithLikes{}
 
 		result = r.feedQuery().
-			Order("deposit_months.id ASC").
+			Order(
+				"deposit_months.id ASC",
+			).
 			Limit(1).
 			Scan(&depositMonth)
 
 		if result.Error != nil {
-			return DepositMonthWithLikes{}, result.Error
+			return DepositMonthWithLikes{},
+				result.Error
 		}
 
 		if result.RowsAffected == 0 {
@@ -81,12 +91,16 @@ func (r *Repository) GetFeedDepositMonth(
 
 	if depositMonthID > 0 {
 		result := r.feedQuery().
-			Where("deposit_months.id = ?", depositMonthID).
+			Where(
+				"deposit_months.id = ?",
+				depositMonthID,
+			).
 			Limit(1).
 			Scan(&depositMonth)
 
 		if result.Error != nil {
-			return DepositMonthWithLikes{}, result.Error
+			return DepositMonthWithLikes{},
+				result.Error
 		}
 
 		if result.RowsAffected == 0 {
@@ -98,12 +112,15 @@ func (r *Repository) GetFeedDepositMonth(
 	}
 
 	result := r.feedQuery().
-		Order("deposit_months.id ASC").
+		Order(
+			"deposit_months.id ASC",
+		).
 		Limit(1).
 		Scan(&depositMonth)
 
 	if result.Error != nil {
-		return DepositMonthWithLikes{}, result.Error
+		return DepositMonthWithLikes{},
+			result.Error
 	}
 
 	if result.RowsAffected == 0 {
@@ -139,7 +156,9 @@ func (r *Repository) GetPublishedDepositMonths(
 			minDaysCount,
 			maxDaysCount,
 		).
-		Order("deposit_months.month_number ASC").
+		Order(
+			"deposit_months.month_number ASC",
+		).
 		Scan(&depositMonths).Error
 
 	if err != nil {
@@ -162,7 +181,10 @@ func (r *Repository) GetDraftDepositMonth(
 		).
 		First(&depositMonth).Error
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(
+		err,
+		gorm.ErrRecordNotFound,
+	) {
 		return nil, nil
 	}
 
@@ -183,7 +205,9 @@ func (r *Repository) CreateDraft(
 		CreatorID: creatorID,
 	}
 
-	if err := r.db.Create(&depositMonth).Error; err != nil {
+	if err := r.db.Create(
+		&depositMonth,
+	).Error; err != nil {
 		return nil, err
 	}
 
@@ -206,14 +230,16 @@ func (r *Repository) PublishDraft(
 			creatorID,
 			ds.DepositMonthStatusDraft,
 		).
-		Updates(map[string]interface{}{
-			"name":         name,
-			"description":  description,
-			"month_number": monthNumber,
-			"days_count":   daysCount,
-			"status":       ds.DepositMonthStatusPublished,
-			"formed_at":    &now,
-		})
+		Updates(
+			map[string]interface{}{
+				"name":         name,
+				"description":  description,
+				"month_number": monthNumber,
+				"days_count":   daysCount,
+				"status":       ds.DepositMonthStatusPublished,
+				"formed_at":    &now,
+			},
+		)
 
 	if result.Error != nil {
 		return result.Error
@@ -226,10 +252,14 @@ func (r *Repository) PublishDraft(
 	return nil
 }
 
+// Старый метод ЛР2.
+// Новый REST API ЛР3 для удаления использует GORM
+// в DeleteDepositMonthAPI.
 func (r *Repository) DeleteDepositMonthSQL(
 	depositMonthID int,
 ) error {
 	sqlDB, err := r.db.DB()
+
 	if err != nil {
 		return err
 	}
@@ -250,7 +280,9 @@ func (r *Repository) DeleteDepositMonthSQL(
 		return err
 	}
 
-	rowsAffected, err := result.RowsAffected()
+	rowsAffected, err :=
+		result.RowsAffected()
+
 	if err != nil {
 		return err
 	}
@@ -261,8 +293,6 @@ func (r *Repository) DeleteDepositMonthSQL(
 
 	return nil
 }
-
-// -------------------- API ЛР3 --------------------
 
 func (r *Repository) serializeDepositMonth(
 	depositMonth ds.DepositMonth,
@@ -279,7 +309,8 @@ func (r *Repository) serializeDepositMonth(
 		Count(&likesCount).Error
 
 	if err != nil {
-		return ds.DepositMonthSerializer{}, err
+		return ds.DepositMonthSerializer{},
+			err
 	}
 
 	var currentUserLikeCount int64
@@ -291,19 +322,25 @@ func (r *Repository) serializeDepositMonth(
 			depositMonth.ID,
 			currentUserID,
 		).
-		Count(&currentUserLikeCount).Error
+		Count(
+			&currentUserLikeCount,
+		).Error
 
 	if err != nil {
-		return ds.DepositMonthSerializer{}, err
+		return ds.DepositMonthSerializer{},
+			err
 	}
 
 	isLiked := 0
+
 	if currentUserLikeCount > 0 {
 		isLiked = 1
 	}
 
 	isCreator := 0
-	if depositMonth.CreatorID == currentUserID {
+
+	if depositMonth.CreatorID ==
+		currentUserID {
 		isCreator = 1
 	}
 
@@ -332,8 +369,12 @@ func (r *Repository) GetPublishedDepositMonthsAPI(
 			minDaysCount,
 			maxDaysCount,
 		).
-		Order("month_number ASC").
-		Find(&depositMonths).Error
+		Order(
+			"month_number ASC",
+		).
+		Find(
+			&depositMonths,
+		).Error
 
 	if err != nil {
 		return nil, err
@@ -346,15 +387,20 @@ func (r *Repository) GetPublishedDepositMonthsAPI(
 	)
 
 	for _, depositMonth := range depositMonths {
-		serialized, err := r.serializeDepositMonth(
-			depositMonth,
-			currentUserID,
-		)
+		serialized, err :=
+			r.serializeDepositMonth(
+				depositMonth,
+				currentUserID,
+			)
+
 		if err != nil {
 			return nil, err
 		}
 
-		result = append(result, serialized)
+		result = append(
+			result,
+			serialized,
+		)
 	}
 
 	return result, nil
@@ -375,20 +421,28 @@ func (r *Repository) GetFeedDepositMonthAPI(
 				depositMonthID,
 			).
 			Order("id ASC").
-			First(&depositMonth).Error
+			First(
+				&depositMonth,
+			).Error
 
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(
+			err,
+			gorm.ErrRecordNotFound,
+		) {
 			err = r.db.
 				Where(
 					"status = ?",
 					ds.DepositMonthStatusPublished,
 				).
 				Order("id ASC").
-				First(&depositMonth).Error
+				First(
+					&depositMonth,
+				).Error
 		}
 
 		if err != nil {
-			return ds.DepositMonthSerializer{}, err
+			return ds.DepositMonthSerializer{},
+				err
 		}
 
 		return r.serializeDepositMonth(
@@ -404,10 +458,13 @@ func (r *Repository) GetFeedDepositMonthAPI(
 				depositMonthID,
 				ds.DepositMonthStatusPublished,
 			).
-			First(&depositMonth).Error
+			First(
+				&depositMonth,
+			).Error
 
 		if err != nil {
-			return ds.DepositMonthSerializer{}, err
+			return ds.DepositMonthSerializer{},
+				err
 		}
 
 		return r.serializeDepositMonth(
@@ -422,10 +479,13 @@ func (r *Repository) GetFeedDepositMonthAPI(
 			ds.DepositMonthStatusPublished,
 		).
 		Order("id ASC").
-		First(&depositMonth).Error
+		First(
+			&depositMonth,
+		).Error
 
 	if err != nil {
-		return ds.DepositMonthSerializer{}, err
+		return ds.DepositMonthSerializer{},
+			err
 	}
 
 	return r.serializeDepositMonth(
@@ -439,7 +499,9 @@ func (r *Repository) DeleteDepositMonthAPI(
 	creatorID int,
 ) error {
 	result := r.db.
-		Model(&ds.DepositMonth{}).
+		Model(
+			&ds.DepositMonth{},
+		).
 		Where(
 			"id = ? AND creator_id = ? AND status IN ?",
 			depositMonthID,
@@ -473,7 +535,9 @@ func (r *Repository) SetDepositMonthLike(
 	var count int64
 
 	err := r.db.
-		Model(&ds.DepositMonth{}).
+		Model(
+			&ds.DepositMonth{},
+		).
 		Where(
 			"id = ? AND status = ?",
 			depositMonthID,
@@ -490,10 +554,11 @@ func (r *Repository) SetDepositMonthLike(
 	}
 
 	if value == 1 {
-		like := ds.DepositMonthLike{
-			UserID:         userID,
-			DepositMonthID: depositMonthID,
-		}
+		like :=
+			ds.DepositMonthLike{
+				UserID:         userID,
+				DepositMonthID: depositMonthID,
+			}
 
 		return r.db.
 			Where(
@@ -501,7 +566,9 @@ func (r *Repository) SetDepositMonthLike(
 				userID,
 				depositMonthID,
 			).
-			FirstOrCreate(&like).Error
+			FirstOrCreate(
+				&like,
+			).Error
 	}
 
 	return r.db.
@@ -510,7 +577,9 @@ func (r *Repository) SetDepositMonthLike(
 			userID,
 			depositMonthID,
 		).
-		Delete(&ds.DepositMonthLike{}).Error
+		Delete(
+			&ds.DepositMonthLike{},
+		).Error
 }
 
 func (r *Repository) uploadDepositMonthFile(
@@ -519,6 +588,7 @@ func (r *Repository) uploadDepositMonthFile(
 	kind string,
 ) error {
 	file, err := header.Open()
+
 	if err != nil {
 		return fmt.Errorf(
 			"ошибка открытия файла: %w",
@@ -530,7 +600,9 @@ func (r *Repository) uploadDepositMonthFile(
 	buffer := make([]byte, 512)
 
 	n, err := file.Read(buffer)
-	if err != nil && err != io.EOF {
+
+	if err != nil &&
+		err != io.EOF {
 		return fmt.Errorf(
 			"ошибка чтения файла: %w",
 			err,
@@ -538,28 +610,38 @@ func (r *Repository) uploadDepositMonthFile(
 	}
 
 	if n == 0 {
-		return fmt.Errorf("пустой файл")
+		return fmt.Errorf(
+			"пустой файл",
+		)
 	}
 
-	contentType := http.DetectContentType(
-		buffer[:n],
-	)
+	contentType :=
+		http.DetectContentType(
+			buffer[:n],
+		)
 
 	if kind == "image" &&
-		!strings.HasPrefix(contentType, "image/") {
+		!strings.HasPrefix(
+			contentType,
+			"image/",
+		) {
 		return fmt.Errorf(
 			"файл должен быть изображением",
 		)
 	}
 
 	if kind == "video" &&
-		!strings.HasPrefix(contentType, "video/") {
+		!strings.HasPrefix(
+			contentType,
+			"video/",
+		) {
 		return fmt.Errorf(
 			"файл должен быть видео",
 		)
 	}
 
 	_, err = file.Seek(0, 0)
+
 	if err != nil {
 		return fmt.Errorf(
 			"ошибка перемещения по файлу: %w",
@@ -577,7 +659,9 @@ func (r *Repository) uploadDepositMonthFile(
 		"video/quicktime": ".mov",
 	}
 
-	extension, ok := extensions[contentType]
+	extension, ok :=
+		extensions[contentType]
+
 	if !ok {
 		return fmt.Errorf(
 			"неподдерживаемый тип файла: %s",
@@ -604,6 +688,7 @@ func (r *Repository) uploadDepositMonthFile(
 			ContentType: contentType,
 		},
 	)
+
 	if err != nil {
 		return fmt.Errorf(
 			"ошибка загрузки файла в MinIO: %w",
@@ -619,12 +704,15 @@ func (r *Repository) uploadDepositMonthFile(
 	)
 
 	column := "image_url"
+
 	if kind == "video" {
 		column = "video_url"
 	}
 
 	err = r.db.
-		Model(&ds.DepositMonth{}).
+		Model(
+			&ds.DepositMonth{},
+		).
 		Where(
 			"id = ?",
 			depositMonthID,
@@ -671,4 +759,25 @@ func (r *Repository) AddOrReplaceDepositMonthVideo(
 		header,
 		"video",
 	)
+}
+
+func (r *Repository) GetDepositMonthByID(
+	depositMonthID int,
+) (*ds.DepositMonth, error) {
+	var depositMonth ds.DepositMonth
+
+	err := r.db.
+		Where(
+			"id = ?",
+			depositMonthID,
+		).
+		First(
+			&depositMonth,
+		).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &depositMonth, nil
 }
