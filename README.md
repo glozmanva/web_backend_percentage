@@ -8,7 +8,7 @@ Backend реализован на Go с использованием Gin, GORM, 
 
 | Метод | URL | Назначение |
 |---|---|---|
-| GET | `/api/deposit-months?min_days_count=28&max_days_count=31` | Список опубликованных расчётных месяцев с фильтрацией по количеству дней |
+| GET | `/api/deposit-months?min_days_count=28&max_days_count=30` | Список опубликованных расчётных месяцев с фильтрацией по количеству дней |
 | GET | `/api/deposit-months/feed` | Лента; параметры `id` и `next=true` позволяют получить конкретную или следующую запись |
 | GET | `/api/deposit-months/draft` | Получение черновика текущего пользователя |
 | POST | `/api/deposit-months` | Создание черновика и загрузка изображения и видео |
